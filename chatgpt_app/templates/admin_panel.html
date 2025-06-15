@@ -1,10 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>پنل مدیریت</title>
+    <style>
+        body { font-family: Vazir, sans-serif; direction: rtl; padding: 2rem; background: #f9f9f9; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 1rem; border: 1px solid #ddd; text-align: center; }
+        th { background: #10a37f; color: white; }
+    </style>
 </head>
 <body>
-$END$
+    <h2>گزارش مصرف کاربران</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>نام کاربری</th>
+                <th>ایمیل</th>
+                <th>مجموع توکن مصرفی</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{ item.username }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.tokens }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

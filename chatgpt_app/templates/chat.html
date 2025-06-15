@@ -1,10 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>چت با GPT</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Vazir', sans-serif;
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        background-color: #EEF1DA;
+        direction: rtl;
+    }
+
+    .sidebar {
+        width: 250px;
+        background-color: #fff;
+        border-left: 1px solid #eee;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    .chat-window {
+        flex: 1;
+        padding: 1rem 2rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        background: #E1EACD;
+    }
+
+    .message {
+        max-width: 75%;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 16px;
+        line-height: 1.8;
+        position: relative;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        word-wrap: break-word;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background-color: #BAD8B6;
+        border-bottom-right-radius: 0;
+    }
+
+    .gpt-message {
+        align-self: flex-start;
+        background-color: #F9F6E6;
+        border-bottom-left-radius: 0;
+    }
+
+    .message small {
+        display: block;
+        margin-top: 0.5rem;
+        color: #999;
+        font-size: 0.8rem;
+        text-align: left;
+        direction: ltr;
+    }
+
+    .form-container {
+        padding: 1rem 2rem;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 1rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        resize: none;
+    }
+
+    button {
+        padding: 0.7rem 1.2rem;
+        font-size: 1rem;
+        background-color: #578E7E;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    .top-info {
+    padding: 0.8rem 2rem;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+
+    button:hover {
+        background-color: #0d7e62;
+    }
+</style>
+
 </head>
 <body>
-$END$
+    <!-- سایدبار -->
+    <div class="sidebar">
+        <h3>تاریخچه</h3>
+    <a href="{% url 'new_session' %}" style="display:block; margin-bottom:10px; background:#075B5E; color:#fff; padding:8px; text-align:center; border-radius:8px;">
+            ➕ چت جدید
+        </a>
+        <ul>
+    {% for history in sessions %}
+        <li data-id="{{ history.id }}"
+            style="display: flex; justify-content: space-between; align-items: center; background: {% if active_session and active_session.id == history.id %}#d1ffe6{% else %}#f1f1f1{% endif %}; padding: 8px; border-radius: 8px; margin-bottom: 5px; cursor:pointer;">
+            <span onclick="location.href='?session_id={{ history.id }}'"
+                  contenteditable="true"
+                  onblur="renameSession(this, {{ history.id }})">{{ history.title }}</span>
+            <a href="{% url 'delete_session' history.id %}" style="color:red; font-weight:bold; text-decoration:none; margin-right:8px;">×</a>
+        </li>
+    {% empty %}
+        <li>هیچ گفتگویی وجود ندارد.</li>
+    {% endfor %}
+</ul>
+    </div>
+
+    <!-- محتوای اصلی -->
+    <div class="main">
+        <div class="top-info">
+    <p style="margin: 0;">
+        ✅ توکن باقی‌مانده: <strong>{{ remaining_tokens }}</strong> |
+        🔥 مصرف‌شده: <strong>{{ used_tokens }}</strong>
+    </p>
+</div>
+
+
+        <!-- پیام‌ها -->
+        <div class="chat-window" id="chat-window">
+    {% for msg in messages %}
+        <div class="message user-message">
+            <p><strong>شما:</strong> {{ msg.prompt }}</p>
+            <small>🎯 توکن: {{ msg.total_tokens }}</small>
+        </div>
+        <div class="message gpt-message">
+            <p><strong>GPT:</strong> {{ msg.response|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+
+        <!-- فرم پایین صفحه -->
+        <form method="post" action="{% url 'send_message' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="session_id" value="{{ active_session.id }}">
+
+    <!-- متن -->
+    <textarea name="prompt" placeholder="پیام شما..." style="width:100%; min-height:80px;"></textarea>
+
+    <!-- آپلودها -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 10px;">
+    <label style="display: flex; align-items: center; gap: 5px;">
+        📷 تصویر:
+        <input type="file" name="image" accept="image/*">
+    </label>
+    <label style="display: flex; align-items: center; gap: 5px;">
+        🎙️ ویس:
+        <input type="file" name="audio" accept="audio/*">
+    </label>
+    <label style="display: flex; align-items: center; gap: 5px;">
+        📄 فایل:
+        <input type="file" name="document">
+    </label>
+</div>
+
+
+    <button type="submit" style="margin-top: 10px;">ارسال</button>
+</form>
+
+    </div>
+
+    <!-- اسکرول خودکار به پایین -->
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function renameSession(element, id) {
+    const newTitle = element.innerText;
+    fetch(`/rename/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'title=' + encodeURIComponent(newTitle)
+    });
+}
+</script>
+
 </body>
 </html>

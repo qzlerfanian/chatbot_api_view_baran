@@ -1,0 +1,147 @@
+{#<!DOCTYPE html>#}
+{#<html lang="fa" dir="rtl">#}
+{#<head>#}
+{#  <meta charset="UTF-8" />#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1" />#}
+{#  <title>پنل کاربری</title>#}
+{#  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/web/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#  <style>#}
+{#    body {#}
+{#      font-family: 'Vazirmatn FD', sans-serif;#}
+{#    }#}
+{#  </style>#}
+{#</head>#}
+{#<body class="bg-gradient-to-tr from-blue-100 via-white to-purple-100 min-h-screen flex flex-col justify-between">#}
+{##}
+{#  <!-- Header -->#}
+{#  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-6 shadow-md text-center text-2xl font-bold">#}
+{#    به پنل کاربری خوش آمدید#}
+{#  </header>#}
+{##}
+{#  <!-- Main Content -->#}
+{#  <main class="flex flex-col items-center justify-center flex-1 px-4 py-10 space-y-6">#}
+{#    <a href="/chat" class="w-64 text-center bg-blue-500 hover:bg-blue-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
+{#      ورود به چت‌بات#}
+{#    </a>#}
+{#    <a href="/dashboard" class="w-64 text-center bg-green-500 hover:bg-green-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
+{#      داشبورد#}
+{#    </a>#}
+{#    <a href="/change-password" class="w-64 text-center bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
+{#      تغییر رمز عبور#}
+{#    </a>#}
+{#  </main>#}
+{##}
+{#  <!-- Footer -->#}
+{#  <footer class="bg-gray-800 text-gray-200 text-sm text-center py-4">#}
+{#    تمامی حقوق برای بیناتوسعه محفوظ است.#}
+{#  </footer>#}
+{##}
+{#</body>#}
+{#</html>#}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>پنل کاربری</title>
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/web/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazirmatn FD', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(to top right, #dbeafe, #ffffff, #ede9fe);
+    }
+
+    header {
+      background: linear-gradient(to right, #254D70, #131D4F);
+      color: #EFE4D2;
+      text-align: center;
+      padding: 1.5rem 0;
+      font-size: 1.30rem;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      gap: 1.5rem;
+    }
+
+    a.button-link {
+      display: block;
+      width: 16rem;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      font-size: 1.125rem;
+      font-weight: 500;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    a.button-chat {
+      background-color: #4B5945;
+    }
+
+    a.button-chat:hover {
+      background-color: #66785F;
+    }
+
+    a.button-dashboard {
+      background-color: #3D3D3D;
+    }
+
+    a.button-dashboard:hover {
+      background-color: #578E7E;
+    }
+
+    a.button-password {
+      background-color: #727D73;
+    }
+
+    a.button-password:hover {
+      background-color: #AAB99A;
+    }
+
+    footer {
+      background-color: #1f2937;
+      color: #e5e7eb;
+      text-align: center;
+      font-size: 0.875rem;
+      padding: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    به پنل کاربری خوش آمدید
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <a href="/chat" class="button-link button-chat">ورود به چت‌بات</a>
+    <a href="/dashboard" class="button-link button-dashboard">داشبود</a>
+    <a href="/change-password" class="button-link button-password">تغییر رمز عبور</a>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    تمامی حقوق برای بیناتوسعه محفوظ است.
+  </footer>
+
+</body>
+</html>

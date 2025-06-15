@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>داشبورد توکن‌ها</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/web/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazirmatn FD', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+<header class="text-white p-5 text-xl text-center font-bold shadow" style="background-color: #002147;">
+  داشبورد مصرف توکن
+</header>
+
+
+  <main class="flex-1 p-6 max-w-4xl mx-auto space-y-8">
+
+    <!-- خلاصه توکن‌ها -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <div class="text-gray-500 mb-2">توکن‌های دریافت‌شده</div>
+        <div class="text-2xl font-bold text-green-600">{{ given_tokens }}</div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <div class="text-gray-500 mb-2">مصرف‌شده</div>
+        <div class="text-2xl font-bold text-red-600">{{ used_tokens }}</div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <div class="text-gray-500 mb-2">توکن باقی‌مانده</div>
+        <div class="text-2xl font-bold text-blue-600">{{ remaining_tokens }}</div>
+      </div>
+    </div>
+
+    <!-- مصرف دوره‌ای -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+      <div class="bg-white p-5 rounded-xl shadow">
+        <div class="text-gray-600 mb-2">مصرف امروز</div>
+        <div class="text-lg text-indigo-700 font-semibold">{{ daily_used }}</div>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow">
+        <div class="text-gray-600 mb-2">مصرف این هفته</div>
+        <div class="text-lg text-indigo-700 font-semibold">{{ weekly_used }}</div>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow">
+        <div class="text-gray-600 mb-2">مصرف این ماه</div>
+        <div class="text-lg text-indigo-700 font-semibold">{{ monthly_used }}</div>
+      </div>
+    </div>
+
+    <!-- نمودار -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h2 class="text-xl font-semibold mb-4 text-center">نمودار مصرف ۷ روز گذشته</h2>
+      <canvas id="usageChart" height="120"></canvas>
+    </div>
+
+  </main>
+
+  <footer class="bg-gray-800 text-gray-200 text-center py-3 text-sm">
+    تمامی حقوق برای بیناتوسعه محفوظ است.
+  </footer>
+
+  <script>
+    const chartData = {{ chart_data|safe }};
+    const labels = chartData.map(item => item.day);
+    const data = chartData.map(item => item.tokens);
+
+    new Chart(document.getElementById('usageChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'تعداد توکن مصرف‌شده',
+          data: data,
+          fill: false,
+          borderColor: 'rgb(99, 102, 241)',
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
