@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>پرسیدن سوال</h2>
+<form method="post">
+  {% csrf_token %}
+  <textarea name="question" rows="4" cols="50"></textarea>
+  <button type="submit">بپرس</button>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>داشبورد توکن</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="container mt-4">
+
+    <h2 class="mb-4">🎯 داشبورد توکن شما</h2>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card text-bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">توکن داده‌شده</h5>
+                    <p class="card-text fs-4">{{ given_tokens }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">توکن مصرف‌شده</h5>
+                    <p class="card-text fs-4">{{ used_tokens }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">موجودی فعلی</h5>
+                    <p class="card-text fs-4">{{ remaining_tokens }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h6>مصرف امروز</h6>
+                    <p class="fs-5">{{ daily_used }} توکن</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h6>مصرف این هفته</h6>
+                    <p class="fs-5">{{ weekly_used }} توکن</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h6>مصرف این ماه</h6>
+                    <p class="fs-5">{{ monthly_used }} توکن</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <h4>📊 نمودار مصرف ۷ روز گذشته</h4>
+    <canvas id="usageChart" height="100"></canvas>
+
+    <script>
+        const chartData = {{ chart_data|safe }};
+        const labels = chartData.map(item => item.day);
+        const data = chartData.map(item => item.tokens);
+
+        const ctx = document.getElementById('usageChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'مصرف توکن',
+                    data: data,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { ticks: { autoSkip: false } }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

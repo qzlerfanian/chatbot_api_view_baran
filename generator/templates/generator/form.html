@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>سامانه تولید عکس | بیناتوسعه هوشمند باران</title>
+    <style>
+        body {
+            font-family: 'Vazir', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #002147; /* سرمه‌ای */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #002147;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 33, 71, 0.1);
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #002147; /* آبی کمرنگ */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        img {
+            margin-top: 20px;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+
+        .alert {
+            background-color: #ffcccc;
+            border: 1px solid #cc0000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            color: #990000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>سامانه تولید عکس بیناتوسعه هوشمند باران</h2>
+    </header>
+
+    <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">عکس را بساز</button>
+        </form>
+
+        {% if image %}
+            <h2>نتیجه:</h2>
+            <p>{{ image.prompt }}</p>
+            <img src="{{ image.image.url }}" alt="Generated Image">
+        {% endif %}
+    </main>
+
+    <footer>
+        تمامی حقوق برای بیناتوسعه محفوظ است ©
+    </footer>
+</body>
+</html>

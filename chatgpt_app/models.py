@@ -36,3 +36,4 @@ class TokenUsage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.tokens} توکن در {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+

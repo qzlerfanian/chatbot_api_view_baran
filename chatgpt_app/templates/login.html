@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Vazir', sans-serif;
-            background: url("{% static 'images/fantastic-seascape-with-ripples.jpg' %}") no-repeat center center fixed;
+            background: linear-gradient(to bottom, #ffffff, #f0f8ff, #e6f0ff);
             background-size: cover;
             display: flex;
             flex-direction: column;
@@ -25,7 +25,7 @@
             height: 70px;
             background-color: rgba(19, 29, 79, 0.9);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 0 2rem;
             border-bottom: 1px solid #ccc;
@@ -35,11 +35,7 @@
         .header-text {
             font-size: 1.4rem;
             font-weight: bold;
-            color: #EFE4D2;;
-        }
-
-        .header-logo img {
-            height: 60px;
+            color: #EFE4D2;
         }
 
         .content {
@@ -91,18 +87,35 @@
             background-color: #131D4F;
         }
 
-        .signup-link {
+        .signup-link, .forgot-link {
             text-align: center;
             margin-top: -0.5rem;
         }
 
+        .signup-link a, .forgot-link a {
+            text-decoration: none;
+        }
+
         .signup-link a {
             color: #007bff;
-            text-decoration: none;
         }
 
         .signup-link a:hover {
             text-decoration: underline;
+        }
+
+        .forgot-link a {
+            color: #dc3545;
+        }
+
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+
+        .messages {
+            margin-bottom: 1rem;
+            color: red;
+            text-align: center;
         }
 
         .footer {
@@ -116,23 +129,34 @@
 </head>
 <body>
     <div class="header">
-
         <div class="header-text">بیناتوسعه هوشمند باران</div>
-        <div class="header-logo">
-            <img src="{% static 'images/Asset_2 (1).png' %}" alt="لوگو">
-        </div>
     </div>
 
     <div class="content">
         <p>خوش آمدید</p>
         <p>نام کاربری و رمز عبور را وارد کنید.</p>
+
         <form method="post">
             {% csrf_token %}
-            <input name="username" placeholder="نام کاربری">
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <input name="username" placeholder="نام کاربری" value="{{ request.POST.username }}">
             <input name="password" type="password" placeholder="رمز عبور">
             <button type="submit">ورود</button>
+
             <div class="signup-link">
                 <a href="{% url 'register' %}">ثبت‌نام</a>
+            </div>
+
+            <div class="forgot-link">
+                <a href="{% url 'password_reset' %}">فراموشی رمز عبور</a>
             </div>
         </form>
     </div>

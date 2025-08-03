@@ -1,0 +1,149 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تبدیل ویس به متن | بینا توسعه هوشمند باران</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazir', sans-serif;
+            background-color: #f2f2f2;
+        }
+        .header {
+            background-color: #002147; /* سرمه‌ای */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .header img {
+            width: 60px;
+            height: auto;
+        }
+        .transcript-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: justify;
+        }
+        footer {
+            background-color: #002147;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+{#    <img src="{% static 'images/logo-right.png' %}" alt="لوگو راست" >#}
+    <div>
+        <h4 class="mb-1">بینا توسعه هوشمند باران</h4>
+        <p class="mb-0">سامانه تولید ویس به متن</p>
+    </div>
+{#    <img src="{% static 'images/logo-left.png' %}" alt="لوگو چپ" >#}
+</div>
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow p-4">
+        <h5 class="mb-3 text-center">آپلود فایل صوتی</h5>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="submit" class="btn btn-primary">ارسال فایل</button>
+                {# <button type="button" id="start-record" class="btn btn-outline-secondary">🎤 ضبط صدا</button> #}
+            </div>
+        </form>
+
+        <!-- متن استخراج‌شده -->
+        {% if transcript %}
+            <div class="transcript-box mt-4">
+                <h6>متن استخراج‌شده:</h6>
+                <p>{{ transcript }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if transcript %}
+  <h3>متن استخراج‌شده:</h3>
+  <p>{{ transcript }}</p>
+
+  <a class="btn btn-success mt-2" href="{% url 'download_word' audio_id=audio_file.id %}" target="_blank">
+    📄 دانلود فایل Word
+  </a>
+{% endif %}
+<footer>
+        تمامی حقوق برای بیناتوسعه محفوظ است ©
+    </footer>
+<!-- جاوااسکریپت برای ضبط صدا -->
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    document.getElementById("start-record")?.addEventListener("click", async () => {
+        console.log("دکمه ضبط کلیک شد");
+        if (!mediaRecorder || mediaRecorder.state === "inactive") {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    console.log("ضبط متوقف شد");
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'recorded_audio.wav');
+
+                    fetch('', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => {
+                        if (!response.ok) throw new Error("خطا در ارسال فایل");
+                        return response.text();
+                    }).then(() => location.reload())
+                      .catch(error => alert("خطا: " + error.message));
+                };
+
+                mediaRecorder.start();
+                alert("در حال ضبط... برای توقف دوباره روی دکمه کلیک کن.");
+                document.getElementById("start-record").textContent = "⏹ توقف ضبط";
+
+            } catch (error) {
+                console.error("خطا در دسترسی به میکروفون:", error);
+                alert("اجازه دسترسی به میکروفون داده نشد یا خطایی رخ داد.");
+            }
+        } else if (mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            document.getElementById("start-record").textContent = "🎤 ضبط صدا";
+        }
+    });
+</script>
+
+</body>
+</html>

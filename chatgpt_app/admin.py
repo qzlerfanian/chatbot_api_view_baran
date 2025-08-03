@@ -32,20 +32,20 @@ class CustomUserAdmin(BaseUserAdmin):
 
             already_given = TokenUsage.objects.filter(user=user).exists()
             if not already_given:
-                TokenUsage.objects.create(user=user, tokens=500)
-                profile.token_balance += 500
+                TokenUsage.objects.create(user=user, tokens=10000000)
+                profile.token_balance += 10000000
                 profile.save()
-        self.message_user(request, "✅ کاربران تایید شدند و ۵۰۰ توکن دریافت کردند.")
+        self.message_user(request, "✅ کاربران تایید شدند و 10000000 توکن دریافت کردند.")
 
     # ✅ تمدید توکن
     def renew_tokens(self, request, queryset):
         for user in queryset:
             profile = user.userprofile
-            TokenUsage.objects.create(user=user, tokens=500)
-            profile.token_balance += 500
+            TokenUsage.objects.create(user=user, tokens=5000000)
+            profile.token_balance += 5000000
             profile.save()
-        self.message_user(request, "🔁 توکن کاربران تمدید شد (۵۰۰ توکن اضافه شد).")
-    renew_tokens.short_description = "تمدید توکن کاربران (۵۰۰ توکن)"
+        self.message_user(request, "🔁 توکن کاربران تمدید شد (5000000 توکن اضافه شد).")
+    renew_tokens.short_description = "تمدید توکن کاربران (5000000 توکن)"
 
 
 admin.site.unregister(User)

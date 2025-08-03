@@ -1,0 +1,151 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>chat session</title>#}
+{#</head>#}
+{#<body>#}
+{#<h2>گفتگو: {{ session.title }}</h2>#}
+{##}
+{#<div class="chat-box">#}
+{#{% for msg in messages %}#}
+{#    <div class="{% if msg.sender == 'user' %}user{% else %}ai{% endif %}">#}
+{#        {{ msg.message }}#}
+{#    </div>#}
+{#{% endfor %}#}
+{##}
+{#</div>#}
+{##}
+{#<form method="post">#}
+{#  {% csrf_token %}#}
+{#  <textarea name="question" rows="3" required></textarea><br>#}
+{#  <button type="submit">ارسال</button>#}
+{#</form>#}
+{##}
+{#</body>#}
+{#</html>#}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>گفتگو - {{ session.title }}</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Vazir", sans-serif;
+            background-color: #0b1f3a;
+            color: #f0f0f0;
+        }
+
+        header {
+            background-color: #102b4e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #1c3e63;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .chat-box {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #132a47;
+            border-radius: 10px;
+            min-height: 300px;
+        }
+
+        .user, .ai {
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            max-width: 80%;
+            white-space: pre-wrap;
+        }
+
+        .user {
+            background-color: #285ea8;
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .ai {
+            background-color: #3b4d67;
+            text-align: right;
+            margin-right: auto;
+        }
+
+        form {
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            padding: 20px;
+            background-color: #1a3255;
+            border-radius: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #223f6a;
+            border: 1px solid #4a6fa3;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        button {
+            background-color: #ffd966;
+            color: #0b1f3a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #ffcc33;
+        }
+
+        footer {
+            background-color: #0b1f3a;
+            color: #a0b3cc;
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #1c3e63;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>گفتگو: {{ session.title }}</h2>
+</header>
+
+<div class="chat-box">
+    {% for msg in messages %}
+        <div class="{% if msg.sender == 'user' %}user{% else %}ai{% endif %}">
+            {{ msg.message }}
+        </div>
+    {% endfor %}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="question" rows="4" placeholder="سؤال خود را اینجا وارد کنید..." required></textarea><br>
+    <button type="submit">ارسال</button>
+</form>
+
+<footer>
+    تمامی حقوق برای بیناتوسعه محفوظ می‌باشد.
+</footer>
+
+</body>
+</html>

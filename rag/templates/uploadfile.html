@@ -1,0 +1,207 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>اپلود فایل</title>#}
+{#</head>#}
+{#<body>#}
+{#<h2>آپلود فایل</h2>#}
+{#<!-- uploadfile.html -->#}
+{##}
+{#<div style="display: flex; gap: 30px;">#}
+{##}
+{#  <!-- ✅ سایدبار فایل‌ها و سشن‌ها -->#}
+{#  <aside style="width: 300px; border-right: 1px solid #ccc; padding-right: 15px;">#}
+{#    <h3>فایل‌های من</h3>#}
+{#    {% for file in user_files %}#}
+{#      <div style="margin-bottom: 20px;">#}
+{#        <strong>{{ file.file.name|slice:"15" }}</strong><br>#}
+{#        <small>{{ file.uploaded_at|date:"Y-m-d H:i" }}</small><br>#}
+{##}
+{#        {% for session in file.chat_sessions.all %}#}
+{#          <div style="margin-top: 5px; margin-right: 10px;">#}
+{#            <a href="{% url 'chat_with_session' session.id %}">{{ session.title }}</a>#}
+{#          </div>#}
+{#        {% empty %}#}
+{#          <small style="color: gray;">هیچ گفتگویی ندارد</small>#}
+{#        {% endfor %}#}
+{#      </div>#}
+{#    {% endfor %}#}
+{#  </aside>#}
+{##}
+{#  <!-- ✅ فرم آپلود -->#}
+{#  <main style="flex: 1;">#}
+{#    <h2>آپلود فایل جدید</h2>#}
+{#    <form method="post" enctype="multipart/form-data">#}
+{#      {% csrf_token %}#}
+{#      {{ form.as_p }}#}
+{#      <button type="submit">بارگذاری</button>#}
+{#    </form>#}
+{#  </main>#}
+{##}
+{#</div>#}
+{##}
+{#<form method="post" enctype="multipart/form-data">#}
+{#    {% csrf_token %}#}
+{#    {{ form.as_p }}#}
+{#    <button type="submit" class="btn btn-primary">آپلود</button>#}
+{#</form>#}
+{##}
+{#</body>#}
+{#</html>#}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>آپلود فایل</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Vazir", sans-serif;
+            background-color: #0b1f3a;
+            color: #f0f0f0;
+        }
+
+        header {
+            background-color: #102b4e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #1c3e63;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header small {
+            font-size: 16px;
+            color: #a0b3cc;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        aside {
+            width: 300px;
+            border-left: 1px solid #4a6fa3;
+            padding-left: 15px;
+        }
+
+        aside h3 {
+            color: #89b4f9;
+            border-bottom: 1px solid #4a6fa3;
+            padding-bottom: 10px;
+        }
+
+        aside a {
+            color: #ffd966;
+            text-decoration: none;
+        }
+
+        aside a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        form {
+            background-color: #132a47;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        button {
+            background-color: #285ea8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1b4b85;
+        }
+
+        footer {
+            background-color: #0b1f3a;
+            color: #a0b3cc;
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #1c3e63;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            background-color: #1b355c;
+            color: #ffffff;
+            border: 1px solid #4a6fa3;
+            border-radius: 5px;
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #dce5f5;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>بیناتوسعه هوشمند باران</h1>
+    <small>سامانه پرسش از فایل</small>
+</header>
+
+<div class="container">
+
+    <!-- ✅ سایدبار فایل‌ها و سشن‌ها -->
+    <aside>
+        <h3>فایل‌های من</h3>
+        {% for file in user_files %}
+            <div style="margin-bottom: 20px;">
+                <strong>{{ file.file.name|slice:"15" }}</strong><br>
+                <small>{{ file.uploaded_at|date:"Y-m-d H:i" }}</small><br>
+
+                {% for session in file.chat_sessions.all %}
+                    <div style="margin-top: 5px; margin-right: 10px;">
+                        <a href="{% url 'chat_with_session' session.id %}">{{ session.title }}</a>
+                    </div>
+                {% empty %}
+                    <small style="color: gray;">هیچ گفتگویی ندارد</small>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </aside>
+
+    <!-- ✅ فرم آپلود -->
+    <main>
+        <h2 style="color: #ffd966;">آپلود فایل جدید</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">بارگذاری</button>
+        </form>
+    </main>
+
+</div>
+
+<footer>
+    تمامی حقوق برای بیناتوسعه محفوظ می‌باشد.
+</footer>
+
+</body>
+</html>

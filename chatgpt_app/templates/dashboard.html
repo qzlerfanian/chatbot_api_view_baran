@@ -11,6 +11,15 @@
     body {
       font-family: 'Vazirmatn FD', sans-serif;
     }
+    .top-left-buttons a {
+    background-color: #6A8EAE;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -58,6 +67,11 @@
       <h2 class="text-xl font-semibold mb-4 text-center">نمودار مصرف ۷ روز گذشته</h2>
       <canvas id="usageChart" height="120"></canvas>
     </div>
+
+      <div class="top-left-buttons flex justify-center gap-4 mt-6">
+  <a href="{% url 'user_dashboard' %}">بازگشت به پروفایل</a>
+  <a href="{% url 'chat' %}">بازگشت به صفحه چت</a>
+</div>
 
   </main>
 

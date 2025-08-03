@@ -1,44 +1,4 @@
-{#<!DOCTYPE html>#}
-{#<html lang="fa" dir="rtl">#}
-{#<head>#}
-{#  <meta charset="UTF-8" />#}
-{#  <meta name="viewport" content="width=device-width, initial-scale=1" />#}
-{#  <title>پنل کاربری</title>#}
-{#  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/web/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">#}
-{#  <script src="https://cdn.tailwindcss.com"></script>#}
-{#  <style>#}
-{#    body {#}
-{#      font-family: 'Vazirmatn FD', sans-serif;#}
-{#    }#}
-{#  </style>#}
-{#</head>#}
-{#<body class="bg-gradient-to-tr from-blue-100 via-white to-purple-100 min-h-screen flex flex-col justify-between">#}
-{##}
-{#  <!-- Header -->#}
-{#  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-6 shadow-md text-center text-2xl font-bold">#}
-{#    به پنل کاربری خوش آمدید#}
-{#  </header>#}
-{##}
-{#  <!-- Main Content -->#}
-{#  <main class="flex flex-col items-center justify-center flex-1 px-4 py-10 space-y-6">#}
-{#    <a href="/chat" class="w-64 text-center bg-blue-500 hover:bg-blue-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
-{#      ورود به چت‌بات#}
-{#    </a>#}
-{#    <a href="/dashboard" class="w-64 text-center bg-green-500 hover:bg-green-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
-{#      داشبورد#}
-{#    </a>#}
-{#    <a href="/change-password" class="w-64 text-center bg-yellow-500 hover:bg-yellow-600 text-white text-lg font-medium py-4 px-6 rounded-2xl shadow-md transition-all duration-300">#}
-{#      تغییر رمز عبور#}
-{#    </a>#}
-{#  </main>#}
-{##}
-{#  <!-- Footer -->#}
-{#  <footer class="bg-gray-800 text-gray-200 text-sm text-center py-4">#}
-{#    تمامی حقوق برای بیناتوسعه محفوظ است.#}
-{#  </footer>#}
-{##}
-{#</body>#}
-{#</html>#}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -67,6 +27,25 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
+    .grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+a.button-link {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+
     main {
       flex: 1;
       display: flex;
@@ -77,42 +56,47 @@
       gap: 1.5rem;
     }
 
-    a.button-link {
-      display: block;
-      width: 16rem;
-      text-align: center;
-      text-decoration: none;
-      color: white;
-      font-size: 1.125rem;
-      font-weight: 500;
-      padding: 1rem 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
-    }
+a.button-link {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: 'Vazirmatn FD', sans-serif; /* اعمال فونت مشخص */
+  color: white; /* متن سفید */
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+}
+
+
 
     a.button-chat {
-      background-color: #4B5945;
+      background-color: #1B3C53;
     }
 
     a.button-chat:hover {
-      background-color: #66785F;
+      background-color: #456882;
     }
 
     a.button-dashboard {
-      background-color: #3D3D3D;
+      background-color: #1B3C53;
     }
 
     a.button-dashboard:hover {
-      background-color: #578E7E;
+      background-color: #456882;
     }
 
     a.button-password {
-      background-color: #727D73;
+      background-color: #1B3C53;
     }
 
     a.button-password:hover {
-      background-color: #AAB99A;
+      background-color: #456882;
     }
 
     footer {
@@ -132,11 +116,19 @@
   </header>
 
   <!-- Main Content -->
+    <!-- Main Content -->
   <main>
-    <a href="/chat" class="button-link button-chat">ورود به چت‌بات</a>
-    <a href="/dashboard" class="button-link button-dashboard">داشبود</a>
-    <a href="/change-password" class="button-link button-password">تغییر رمز عبور</a>
+    <div class="grid-container">
+      <a href="/chat" class="button-link button-chat">ورود به چت‌بات</a>
+      <a href="{% url 'upload_file' %}" class="button-link button-dashboard">پرسش از فایل</a>
+      <a href="{% url 'upload_audio' %}" class="button-link button-dashboard">تبدیل ویس به متن</a>
+      <a href="{% url 'generate_image' %}" class="button-link button-dashboard">تبدیل متن به عکس</a>
+      <a href="/dashboard" class="button-link button-dashboard">داشبود</a>
+      <a href="/change-password" class="button-link button-password">تغییر رمز عبور</a>
+      <a href="/logout" class="button-link button-password">خروج</a>
+    </div>
   </main>
+
 
   <!-- Footer -->
   <footer>
@@ -145,3 +137,4 @@
 
 </body>
 </html>
+

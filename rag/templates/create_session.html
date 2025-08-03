@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ایجاد گفتگوی جدید</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Vazir", sans-serif;
+            background-color: #0b1f3a;
+            color: #f0f0f0;
+        }
+
+        header {
+            background-color: #102b4e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #1c3e63;
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #1a3255;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input, select, textarea {
+            background-color: #223f6a;
+            color: #ffffff;
+            border: 1px solid #4a6fa3;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #dce5f5;
+        }
+
+        button {
+            background-color: #ffd966;
+            color: #0b1f3a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ffcc33;
+        }
+
+        footer {
+            background-color: #0b1f3a;
+            color: #a0b3cc;
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #1c3e63;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>ایجاد گفتگوی جدید برای {{ file.file.name }}</h2>
+</header>
+
+<main>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">شروع گفتگو</button>
+    </form>
+</main>
+
+<footer>
+    تمامی حقوق برای بیناتوسعه محفوظ می‌باشد.
+</footer>
+
+</body>
+</html>
