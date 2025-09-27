@@ -23,7 +23,7 @@
             right: 0;
             left: 0;
             height: 70px;
-            background-color: rgba(19, 29, 79, 0.9);
+            background-color: rgb(0, 21, 82);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,7 +35,7 @@
         .header-text {
             font-size: 1.4rem;
             font-weight: bold;
-            color: #EFE4D2;
+            color: #fcfcfc;
         }
 
         .content {
@@ -48,17 +48,17 @@
         }
 
         form {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: rgb(255, 255, 255);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgb(0, 7, 23);
             padding: 2rem;
             width: 400px;
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            color: #000;
+            color: #ffffff;
         }
 
         input {
@@ -76,15 +76,15 @@
         button {
             padding: 12px;
             font-size: 1rem;
-            background-color: #254D70;
-            color: white;
+            background-color: rgb(0, 21, 82);
+            color: #fffcfc;
             border: none;
             border-radius: 8px;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #131D4F;
+            background-color: #00248c;
         }
 
         .signup-link, .forgot-link {
@@ -121,20 +121,20 @@
         .footer {
             text-align: center;
             padding: 1rem;
-            background-color: rgba(255,255,255,0.6);
+            background-color: rgb(0, 21, 82);
             font-size: 0.9rem;
-            color: #333;
+            color: #f9f9fa;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-text">بیناتوسعه هوشمند باران</div>
+        <div class="header-text">Hello! Wellcome to BaranSmart</div>
     </div>
 
     <div class="content">
-        <p>خوش آمدید</p>
-        <p>نام کاربری و رمز عبور را وارد کنید.</p>
+
+        <p>!Please Enter Your Username And Password Correctly</p>
 
         <form method="post">
             {% csrf_token %}
@@ -147,16 +147,17 @@
             </div>
             {% endif %}
 
-            <input name="username" placeholder="نام کاربری" value="{{ request.POST.username }}">
-            <input name="password" type="password" placeholder="رمز عبور">
-            <button type="submit">ورود</button>
+            <input name="username" placeholder="Username" value="{{ request.POST.username }}">
+            <input name="password" type="password" placeholder="Password">
+            <button type="submit">Login</button>
 
             <div class="signup-link">
-                <a href="{% url 'register' %}">ثبت‌نام</a>
+                <a href="{% url 'register' %}">Register</a>
+
             </div>
 
             <div class="forgot-link">
-                <a href="{% url 'password_reset' %}">فراموشی رمز عبور</a>
+                <a href="{% url 'password_reset' %}">Forget Password</a>
             </div>
         </form>
     </div>

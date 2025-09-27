@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>داشبورد توکن‌ها</title>
+  <title>token dashboard!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,7 +12,7 @@
       font-family: 'Vazirmatn FD', sans-serif;
     }
     .top-left-buttons a {
-    background-color: #6A8EAE;
+    background-color: #070031;
     color: white;
     padding: 0.6rem 1rem;
     border-radius: 8px;
@@ -23,8 +23,8 @@
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-<header class="text-white p-5 text-xl text-center font-bold shadow" style="background-color: #002147;">
-  داشبورد مصرف توکن
+<header class="text-white p-5 text-xl text-center font-bold shadow" style="background-color: #000d33;">
+  TokenUsage DashBoard
 </header>
 
 
@@ -33,49 +33,49 @@
     <!-- خلاصه توکن‌ها -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
       <div class="bg-white p-6 rounded-xl shadow-md">
-        <div class="text-gray-500 mb-2">توکن‌های دریافت‌شده</div>
-        <div class="text-2xl font-bold text-green-600">{{ given_tokens }}</div>
+        <div class="text-gray-500 mb-2">given_tokens</div>
+        <div class="text-2xl font-bold text-blue-950">{{ given_tokens }}</div>
       </div>
       <div class="bg-white p-6 rounded-xl shadow-md">
-        <div class="text-gray-500 mb-2">مصرف‌شده</div>
-        <div class="text-2xl font-bold text-red-600">{{ used_tokens }}</div>
+        <div class="text-gray-500 mb-2">used_tokens</div>
+        <div class="text-2xl font-bold text-blue-950">{{ used_tokens }}</div>
       </div>
       <div class="bg-white p-6 rounded-xl shadow-md">
-        <div class="text-gray-500 mb-2">توکن باقی‌مانده</div>
-        <div class="text-2xl font-bold text-blue-600">{{ remaining_tokens }}</div>
+        <div class="text-gray-500 mb-2">remaining_tokens</div>
+        <div class="text-2xl font-bold text-blue-950">{{ remaining_tokens }}</div>
       </div>
     </div>
 
     <!-- مصرف دوره‌ای -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
       <div class="bg-white p-5 rounded-xl shadow">
-        <div class="text-gray-600 mb-2">مصرف امروز</div>
-        <div class="text-lg text-indigo-700 font-semibold">{{ daily_used }}</div>
+        <div class="text-gray-600 mb-2">daily_used</div>
+        <div class="text-lg text-blue-950 font-semibold">{{ daily_used }}</div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow">
-        <div class="text-gray-600 mb-2">مصرف این هفته</div>
-        <div class="text-lg text-indigo-700 font-semibold">{{ weekly_used }}</div>
+        <div class="text-gray-600 mb-2">weekly_used</div>
+        <div class="text-lg text-blue-950 font-semibold">{{ weekly_used }}</div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow">
-        <div class="text-gray-600 mb-2">مصرف این ماه</div>
-        <div class="text-lg text-indigo-700 font-semibold">{{ monthly_used }}</div>
+        <div class="text-gray-600 mb-2">monthly_used</div>
+        <div class="text-lg text-blue-950 font-semibold">{{ monthly_used }}</div>
       </div>
     </div>
 
     <!-- نمودار -->
     <div class="bg-white p-6 rounded-xl shadow">
-      <h2 class="text-xl font-semibold mb-4 text-center">نمودار مصرف ۷ روز گذشته</h2>
+      <h2 class="text-xl font-semibold mb-4 text-center">chart past 7 days!</h2>
       <canvas id="usageChart" height="120"></canvas>
     </div>
 
       <div class="top-left-buttons flex justify-center gap-4 mt-6">
-  <a href="{% url 'user_dashboard' %}">بازگشت به پروفایل</a>
-  <a href="{% url 'chat' %}">بازگشت به صفحه چت</a>
+  <a href="{% url 'user_dashboard' %}">ComeBack to profile</a>
+  <a href="{% url 'chat' %}">ComeBack to ChatBot</a>
 </div>
 
   </main>
 
-  <footer class="bg-gray-800 text-gray-200 text-center py-3 text-sm">
+  <footer class="bg-blue-950 text-gray-200 text-center py-3 text-sm">
     تمامی حقوق برای بیناتوسعه محفوظ است.
   </footer>
 
@@ -89,10 +89,10 @@
       data: {
         labels: labels,
         datasets: [{
-          label: 'تعداد توکن مصرف‌شده',
+          label: 'TokenUsage',
           data: data,
           fill: false,
-          borderColor: 'rgb(99, 102, 241)',
+          borderColor: 'rgb(1,0,52)',
           tension: 0.3
         }]
       },

@@ -117,16 +117,17 @@
             background-color: #0b1f3a;
             color: #a0b3cc;
             text-align: center;
-            padding: 15px;
+            padding: 10px;
             border-top: 1px solid #1c3e63;
             font-size: 14px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h2>گفتگو: {{ session.title }}</h2>
+    <h2>chat: {{ session.title }}</h2>
 </header>
 
 <div class="chat-box">
@@ -139,8 +140,8 @@
 
 <form method="post">
     {% csrf_token %}
-    <textarea name="question" rows="4" placeholder="سؤال خود را اینجا وارد کنید..." required></textarea><br>
-    <button type="submit">ارسال</button>
+    <textarea name="question" rows="4" placeholder="ask question from your file!" required></textarea><br>
+    <button type="submit">send</button>
 </form>
 
 <footer>

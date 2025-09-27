@@ -28,6 +28,8 @@ urlpatterns = [
     path('audio/', include('transcriber.urls')),
     path('rag/', include('rag.urls')),
     path('image/', include('generator.urls')),
+    path('chatimage/', include('chatimage.urls')),
+
 ]
 
 if settings.DEBUG:

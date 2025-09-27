@@ -70,23 +70,24 @@
             background-color: #0b1f3a;
             color: #a0b3cc;
             text-align: center;
-            padding: 15px;
+            padding: 10px;
             border-top: 1px solid #1c3e63;
             font-size: 14px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h2>ایجاد گفتگوی جدید برای {{ file.file.name }}</h2>
+    <h2>new chat for  {{ file.file.name }}</h2>
 </header>
 
 <main>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">شروع گفتگو</button>
+        <button type="submit">star chat</button>
     </form>
 </main>
 

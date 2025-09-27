@@ -12,14 +12,14 @@
         }
 
         header {
-            background-color: #002147; /* سرمه‌ای */
+            background-color: #000d33;
             color: #ffffff;
-            padding: 20px;
+            padding: 10px;
             text-align: center;
         }
 
         footer {
-            background-color: #002147;
+            background-color: #000d33;
             color: #ffffff;
             padding: 10px;
             text-align: center;
@@ -31,26 +31,37 @@
 
         main {
             max-width: 600px;
+            height: calc(100vh - 140px); /* کل ارتفاع منهای هدر و فوتر */
             margin: 40px auto;
             background-color: #ffffff;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 33, 71, 0.1);
-        }
-
-        h1 {
-            color: #ffffff;
-            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* دکمه پایین */
         }
 
         form {
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 50%;
+        }
+
+        textarea {
+            flex: 1;
+            font-size: 1em;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: none; /* کاربر نتونه دستی کوچک کنه */
+            margin-bottom: 15px;
         }
 
         button {
-            background-color: #002147; /* آبی کمرنگ */
+            background-color: #000d33;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -58,7 +69,7 @@
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #0074b2;
         }
 
         img {
@@ -79,7 +90,7 @@
 </head>
 <body>
     <header>
-        <h2>سامانه تولید عکس بیناتوسعه هوشمند باران</h2>
+        <h2>Baran Smart Convert Text to Image</h2>
     </header>
 
     <main>
@@ -91,12 +102,12 @@
 
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">عکس را بساز</button>
+            <textarea id="id_prompt" name="prompt" placeholder="Enter image description..."></textarea>
+            <button type="submit">Generate Image</button>
         </form>
 
         {% if image %}
-            <h2>نتیجه:</h2>
+            <h2>Result:</h2>
             <p>{{ image.prompt }}</p>
             <img src="{{ image.image.url }}" alt="Generated Image">
         {% endif %}

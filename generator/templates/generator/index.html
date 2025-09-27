@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>تحلیل و ویرایش تصویر با GPT</title>
+</head>
+<body>
+    <h1>ارسال تصویر به GPT</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ارسال</button>
+    </form>
+
+    {% if result %}
+        <h2>نتیجه:</h2>
+        <p>{{ result }}</p>
+    {% endif %}
+
+    {% if image_url %}
+        <h2>تصویر خروجی:</h2>
+        <img src="{{ image_url }}" alt="output" style="max-width: 400px;">
+    {% endif %}
+</body>
+</html>

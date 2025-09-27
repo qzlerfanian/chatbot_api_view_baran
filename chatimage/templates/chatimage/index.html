@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>چت با تصویر</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body { font-family: sans-serif; direction: rtl; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+    .user { color: blue; margin: 5px 0; }
+    .assistant { color: green; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h2>📷 آپلود عکس</h2>
+  <form id="image-form" enctype="multipart/form-data">
+    <input type="file" name="image" required>
+    <button type="submit">ارسال</button>
+  </form>
+
+  <h2>💬 چت</h2>
+  <div id="chat-box"></div>
+  <form id="chat-form">
+    <input type="text" name="question" placeholder="سوالت رو بنویس..." required>
+    <button type="submit">بپرس</button>
+  </form>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+
+document.getElementById("image-form").onsubmit = async (e) => {
+  e.preventDefault();
+  let formData = new FormData(e.target);
+  let res = await axios.post("/chatimage/upload_image/", formData);
+  chatBox.innerHTML += `<div class="assistant">🤖: ${res.data.answer}</div>`;
+};
+
+document.getElementById("chat-form").onsubmit = async (e) => {
+  e.preventDefault();
+  let formData = new FormData(e.target);
+  let q = formData.get("question");
+  chatBox.innerHTML += `<div class="user">👤: ${q}</div>`;
+  e.target.reset();
+
+  let res = await axios.post("/chatimage/ask/", formData);
+  chatBox.innerHTML += `<div class="assistant">🤖: ${res.data.answer}</div>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+};
+</script>
+</body>
+</html>

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rag',
     'generator',
+    'chatimage',
 ]
 
 MIDDLEWARE = [

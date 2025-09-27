@@ -18,8 +18,8 @@
     }
 
     header {
-      background: linear-gradient(to right, #254D70, #131D4F);
-      color: #EFE4D2;
+      background: linear-gradient(to right, #000d33, #001552);
+      color: #ffffff;
       text-align: center;
       padding: 1.5rem 0;
       font-size: 1.30rem;
@@ -65,7 +65,7 @@ a.button-link {
   font-size: 1.2rem;
   font-weight: 500;
   font-family: 'Vazirmatn FD', sans-serif; /* اعمال فونت مشخص */
-  color: white; /* متن سفید */
+  color: #fcfcfc; /* متن سفید */
   padding: 1rem;
   border-radius: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -76,32 +76,36 @@ a.button-link {
 
 
     a.button-chat {
-      background-color: #1B3C53;
+      background-color: #001552FF;
+        backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
     }
 
     a.button-chat:hover {
-      background-color: #456882;
+      background-color: #004c83;
     }
 
     a.button-dashboard {
-      background-color: #1B3C53;
+      background-color: #001552FF;
+        backdrop-filter: blur(10px);
     }
 
     a.button-dashboard:hover {
-      background-color: #456882;
+      background-color: #004c83;
     }
 
     a.button-password {
-      background-color: #1B3C53;
+      background-color: #001552FF;
+        backdrop-filter: blur(10px);
     }
 
     a.button-password:hover {
-      background-color: #456882;
+      background-color: #004c83;
     }
 
     footer {
-      background-color: #1f2937;
-      color: #e5e7eb;
+      background-color: #001552FF;
+      color: #fdfdfd;
       text-align: center;
       font-size: 0.875rem;
       padding: 1rem 0;
@@ -112,20 +116,20 @@ a.button-link {
 
   <!-- Header -->
   <header>
-    به پنل کاربری خوش آمدید
+    Hello! WellCome to Profile
   </header>
 
   <!-- Main Content -->
     <!-- Main Content -->
   <main>
     <div class="grid-container">
-      <a href="/chat" class="button-link button-chat">ورود به چت‌بات</a>
-      <a href="{% url 'upload_file' %}" class="button-link button-dashboard">پرسش از فایل</a>
-      <a href="{% url 'upload_audio' %}" class="button-link button-dashboard">تبدیل ویس به متن</a>
-      <a href="{% url 'generate_image' %}" class="button-link button-dashboard">تبدیل متن به عکس</a>
-      <a href="/dashboard" class="button-link button-dashboard">داشبود</a>
-      <a href="/change-password" class="button-link button-password">تغییر رمز عبور</a>
-      <a href="/logout" class="button-link button-password">خروج</a>
+      <a href="/chat" class="button-link button-chat">ChatBot</a>
+      <a href="{% url 'upload_file' %}" class="button-link button-dashboard">Ask from file</a>
+      <a href="{% url 'upload_audio' %}" class="button-link button-dashboard">voice to text</a>
+      <a href="{% url 'generate_image' %}" class="button-link button-dashboard">text to image</a>
+      <a href="/dashboard" class="button-link button-dashboard">Dashboard</a>
+      <a href="/change-password" class="button-link button-password">change password</a>
+      <a href="/logout" class="button-link button-password">Logout</a>
     </div>
   </main>
 

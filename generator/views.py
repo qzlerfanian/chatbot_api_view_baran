@@ -8,13 +8,17 @@ from django.utils.timezone import now
 from datetime import timedelta
 import requests
 from django.shortcuts import render
-from .forms import PromptForm
+from .forms import PromptForm , ImageForm
 from .models import GeneratedImage
 from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
 from chatgpt_app.models import UserProfile, TokenUsage
 from django.contrib import messages
 import openai
+from django.core.files.storage import default_storage
+
+
+
 
 
 client = openai.OpenAI(api_key= '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'
@@ -84,7 +88,7 @@ def generate_image(request):
                 TokenUsage.objects.create(
                     user=request.user,
                     tokens=tokens_required,
-                    reason=f"generate_image_{size}"
+                    # reason=f"generate_image_{size}"
                 )
 
                 messages.success(request, f"{tokens_required} توکن بابت تولید تصویر کسر شد. موجودی فعلی: {profile.token_balance}")
@@ -103,6 +107,66 @@ def generate_image(request):
         'token_balance': profile.token_balance,
         'last_usage': last_usage
     })
+
+# EDIT IMAGE################################################################
+@login_required
+def index(request):
+    result = None
+    image_url = None
+
+    if request.method == "POST":
+        form = ImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            task = form.cleaned_data["task"]
+            prompt = form.cleaned_data["prompt"] or "این تصویر را توضیح بده"
+
+            # ذخیره عکس
+            if request.FILES.get("image"):
+                img_path = default_storage.save(request.FILES["image"].name, request.FILES["image"])
+                img_full_path = os.path.join(default_storage.location, img_path)
+
+                # ساختن URL کامل برای ارسال به GPT
+                img_url = request.build_absolute_uri(f"/media/{img_path}")
+
+            # حالت تحلیل تصویر با URL
+            if task == "analyze" and request.FILES.get("image"):
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": {"url": img_url}}
+                        ]
+                    }]
+                )
+                result = response.choices[0].message["content"]
+
+            # حالت ویرایش تصویر (اینجا همچنان gpt-image-1 نیاز به Verify داره)
+            elif task == "edit" and request.FILES.get("image"):
+                with open(img_full_path, "rb") as f:
+                    res = client.images.edit(
+                        model="gpt-image-1",
+                        image=f,
+                        prompt=prompt,
+                        size="1024x1024"
+                    )
+                image_url = res.data[0].url
+
+            # حالت تولید تصویر جدید
+            elif task == "generate":
+                res = client.images.generate(
+                    model="gpt-image-1",
+                    prompt=prompt,
+                    size="1024x1024"
+                )
+                image_url = res.data[0].url
+
+    else:
+        form = ImageForm()
+
+    return render(request, "generator/index.html", {"form": form, "result": result, "image_url": image_url})
+
 
 # @login_required
 # def generate_image(request):

@@ -22,6 +22,16 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import PasswordChangeForm
+import base64
+import mimetypes
+from io import BytesIO
+from django.core.files.base import ContentFile
+# اگر می‌خوای تصاویر را قبل از ارسال فشرده کنی (اختیاری)
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except Exception:
+    PIL_AVAILABLE = False
 
 
 
@@ -400,88 +410,307 @@ def send_message(request):
         chat_session.save()
 
         try:
+            # -------------------------
+            # جایگزین این بخش در ویو send_message
+            # -------------------------
             if image:
-                path = default_storage.save(f'uploads/{image.name}', ContentFile(image.read()))
-                image_url = request.build_absolute_uri(default_storage.url(path))
+                try:
+                    # 1) بخوان تصویر به‌صورت بایت (یک‌بار بخوان؛ اگر می‌خواهی هم ذخیره کنی از همین bytes استفاده کن)
+                    image_bytes = image.read()
 
-                result = client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=[{
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt or "این تصویر را تحلیل کن"},
-                            {"type": "image_url", "image_url": {"url": image_url}}
-                        ]
-                    }],
-                    max_tokens=1000
-                )
-                reply = result.choices[0].message.content
-                usage = result.usage
+                    # 2) (اختیاری) فشرده‌سازی با PIL برای جلوگیری از ارسال تصویر خیلی بزرگ
+                    if PIL_AVAILABLE:
+                        try:
+                            pil_img = Image.open(BytesIO(image_bytes))
+                            # محدودکننده اندازه (مثال: طول یا عرض حداکثر 1024)
+                            pil_img.thumbnail((1024, 1024))
+                            out = BytesIO()
+                            # اگر تصویر شفافیت داشت، آن را به RGB تبدیل کن تا JPEG قابل ذخیره باشد
+                            if pil_img.mode in ("RGBA", "LA"):
+                                background = Image.new("RGB", pil_img.size, (255, 255, 255))
+                                background.paste(pil_img, mask=pil_img.split()[3])
+                                background.save(out, format="JPEG", quality=75)
+                            else:
+                                pil_img.save(out, format="JPEG", quality=75)
+                            image_bytes = out.getvalue()
+                            image_mime = "image/jpeg"
+                        except Exception:
+                            # در صورت خطا در پردازش PIL، به حالت پیش‌فرض ادامه بده
+                            image_mime = getattr(image, "content_type", None) or mimetypes.guess_type(image.name)[
+                                0] or "image/jpeg"
+                    else:
+                        image_mime = getattr(image, "content_type", None) or mimetypes.guess_type(image.name)[
+                            0] or "image/jpeg"
+
+                    # 3) (اختیاری) اگر می‌خواهی همچنان فایل را در storage ذخیره کنی:
+                    # توجه: اگر تصویر را ذخیره کردی دیگر نیازی به ری‌خواندن فایلت نیست چون bytes را نگه داشتیم.
+                    try:
+                        default_storage.save(f'uploads/{image.name}', ContentFile(image_bytes))
+                    except Exception:
+                        # اگر ذخیره به هر دلیل ناموفق بود، ادامه می‌دهیم چون برای ارسال به مدل نیازی به URL نداریم
+                        pass
+
+                    # 4) ساخت data URI
+                    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+                    data_uri = f"data:{image_mime};base64,{image_base64}"
+
+                    # 5) ارسال به API با همان الگوی شما (data URI به‌جای URL عمومی)
+                    result = client.chat.completions.create(
+                        model="gpt-4o",  # مدل دلخواه خودت بذار؛ در نمونه‌ات gpt-4.1-mini هم بود
+                        messages=[{
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": prompt or "این تصویر را تحلیل کن"},
+                                {"type": "image_url", "image_url": {"url": data_uri}}
+                            ]
+                        }],
+                        max_tokens=1000
+                    )
+
+                    reply = result.choices[0].message.content
+                    usage = result.usage
+
+                except Exception as exc:
+                    # خطای اختصاصی برای دیباگ
+                    return HttpResponse(f"🚫 خطا هنگام ارسال تصویر: {str(exc)}", status=500)
+
+
+
 
             elif audio:
-                transcript = client.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=audio
-                )
-                result = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": transcript.text}]
-                )
-                reply = result.choices[0].message.content
-                usage = result.usage
+
+                try:
+
+                    # 1) فایل صوتی رو به صورت bytes بخون
+
+                    audio_bytes = audio.read()
+
+                    # 2) نام و نوع MIME رو مشخص کن
+
+                    audio_name = getattr(audio, "name", "voice.wav")
+
+                    audio_mime = getattr(audio, "content_type", None) or "audio/wav"
+
+                    # 3) فایل موقت برای پاس دادن به API بساز
+
+                    from io import BytesIO
+
+                    audio_file = BytesIO(audio_bytes)
+
+                    audio_file.name = audio_name  # مهم چون Whisper به پسوند توجه می‌کنه
+
+                    # 4) ارسال به مدل Whisper برای تبدیل گفتار به متن
+
+                    transcript = client.audio.transcriptions.create(
+
+                        model="whisper-1",
+
+                        file=audio_file
+
+                    )
+
+                    prompt_text = transcript.text.strip()
+
+                    # 5) از GPT بپرس: آیا باید تصویر تولید شود؟
+
+                    decision = client.chat.completions.create(
+
+                        model="gpt-4o-mini",
+
+                        messages=[
+
+                            {"role": "system",
+                             "content": "تشخیص بده آیا درخواست کاربر نیاز به تولید عکس دارد یا نه. فقط yes یا no جواب بده."},
+
+                            {"role": "user", "content": prompt_text}
+
+                        ],
+
+                        max_tokens=5
+
+                    )
+
+                    decision_text = decision.choices[0].message.content.lower()
+
+                    if "yes" in decision_text:
+
+                        # 6) تولید تصویر
+
+                        img_result = client.images.generate(
+
+                            model="dall-e-3",
+
+                            prompt=prompt_text,
+
+                            size="1024x1024"
+
+                        )
+
+                        img_url = img_result.data[0].url
+
+                        reply = f"🖼️ تصویر ساخته شد:<br><img src='{img_url}' style='max-width:100%;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3);'>"
+
+                        usage = {"total_tokens": 0}
+
+
+                    else:
+
+                        # 7) مسیر عادی → جواب متنی
+
+                        result = client.chat.completions.create(
+
+                            model="gpt-4o-mini",  # یا gpt-4o برای کیفیت بالاتر
+
+                            messages=[{"role": "user", "content": prompt_text}],
+
+                            max_tokens=800
+
+                        )
+
+                        reply = result.choices[0].message.content
+
+                        usage = result.usage
+
+
+                except Exception as exc:
+
+                    return HttpResponse(f"🚫 خطا هنگام پردازش ویس: {str(exc)}", status=500)
 
             elif document:
                 file_response = client.files.create(file=document, purpose="assistants")
                 reply = "✅ فایل شما آپلود شد ولی فعلاً پشتیبانی از تحلیل مستقیم فایل فعال نیست."
                 usage = {'total_tokens': 0, 'prompt_tokens': 0, 'completion_tokens': 0}
 
+
             else:
-                system_message = {
-                    "role": "system",
-                    "content": (
-                        "شما یک دستیار حرفه‌ای و مودب هستید که به زبان فارسی پاسخ می‌دهید. پاسخ‌ها باید:\n"
-                        "- ساختاریافته باشند ✅\n"
-                        "- شامل تیترهای برجسته (Bold) برای بخش‌های مختلف باشند 📝\n"
-                        "- در صورت نیاز لیست‌وار توضیح داده شوند 🔹\n"
-                        "- از علائم نگارشی درست استفاده شود ✍️\n"
-                        "- از ایموجی برای زیباتر شدن پاسخ بهره بگیرید 😊\n"
-                        "- پاسخ شامل مقدمه، بدنه و جمع‌بندی باشد 📚\n\n"
-                        "پاسخ‌ها باید شبیه خروجی چت‌بات ChatGPT باشند؛ مفصل، خوانا، و با لحن دوستانه و حرفه‌ای.\n"
-                        "انگلیسی ها رو چپ چین کن .\n"
-                        "اگر کاربر سؤال کوتاهی پرسید، شما باز هم پاسخ کامل و توضیح‌دار بدهید."
 
-                        "```python\nprint(\"سلام دنیا\")\n```\n\n"
-                        " بین بخش‌ها فاصله بگذار، و در صورت نیاز تیترها را bold کن با **. متن باید بسیار مرتب و خوانا باشد."
+                try:
+
+                    # 1) سیستم پیام پایه
+
+                    system_message = {
+
+                        "role": "system",
+
+                        "content": (
+
+                            "شما یک دستیار حرفه‌ای و مودب هستید که به زبان فارسی پاسخ می‌دهید. پاسخ‌ها باید:\n"
+
+                            "- ساختاریافته باشند ✅\n"
+
+                            "- شامل تیترهای برجسته (Bold) برای بخش‌های مختلف باشند 📝\n"
+
+                            "- در صورت نیاز لیست‌وار توضیح داده شوند 🔹\n"
+
+                            "- از علائم نگارشی درست استفاده شود ✍️\n"
+
+                            "- از ایموجی برای زیباتر شدن پاسخ بهره بگیرید 😊\n"
+
+                            "- پاسخ شامل مقدمه، بدنه و جمع‌بندی باشد 📚\n"
+
+                            "پاسخ‌ها باید شبیه خروجی چت‌بات ChatGPT باشند؛ مفصل، خوانا، و با لحن دوستانه و حرفه‌ای.\n"
+
+                            "انگلیسی‌ها رو چپ‌چین کن.\n"
+
+                            "اگر کاربر سؤال کوتاهی پرسید، باز هم پاسخ کامل و توضیح‌دار بده.\n"
+
+                            "بین بخش‌ها فاصله بگذار و تیترها را bold کن با **. متن باید مرتب و خوانا باشد."
+
+                        )
+
+                    }
+
+                    # 2) بررسی هوشمندانه: آیا کاربر درخواست تولید تصویر دارد؟
+
+                    decision = client.chat.completions.create(
+
+                        model="gpt-4o-mini",
+
+                        messages=[
+
+                            {"role": "system",
+                             "content": "تشخیص بده آیا درخواست کاربر نیاز به تولید عکس دارد یا نه. فقط yes یا no جواب بده."},
+
+                            {"role": "user", "content": prompt}
+
+                        ],
+
+                        max_tokens=5
+
                     )
-                }
 
-                previous_messages = Message.objects.filter(session=chat_session).order_by('-id')[:10]
-                history = [system_message]
-                for m in reversed(previous_messages):
-                    history.append({"role": "user", "content": m.prompt})
-                    history.append({"role": "assistant", "content": m.response})
+                    decision_text = decision.choices[0].message.content.lower()
 
-                # 🔍 اگر به نظر رسید نیاز به سرچ وب هست، انجام بده
-                search_keywords = ["دلار","ملک","اخبار", "هوا", "قیمت", "کی", "چند", "کجا", "چگونه", "آخرین"]
-                if any(word in prompt for word in search_keywords):
-                    web_info = search_web_snippet(prompt)
-                    if web_info:
-                        prompt += f"\n\n🛰 این اطلاعات از جستجوی وب پیدا شد:\n{web_info}"
+                    if "yes" in decision_text:
 
-                history.append({"role": "user", "content": prompt})
+                        # 3) تولید تصویر
 
-                result = client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=history,
-                    max_tokens=1200,
-                    temperature=0.7
-                )
-                reply = result.choices[0].message.content
-                usage = result.usage
+                        img_result = client.images.generate(
 
+                            model="dall-e-3",
+
+                            prompt=prompt,
+
+                            size="1024x1024"
+
+                        )
+
+                        img_url = img_result.data[0].url
+
+                        reply = f"🖼️ تصویر ساخته شد:<br><img src='{img_url}' style='max-width:100%;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3);'>"
+
+                        usage = {"total_tokens": 0}
+
+
+                    else:
+
+                        # 4) مسیر عادی → پیام متنی
+
+                        previous_messages = Message.objects.filter(session=chat_session).order_by('-id')[:10]
+
+                        history = [system_message]
+
+                        for m in reversed(previous_messages):
+                            history.append({"role": "user", "content": m.prompt})
+
+                            history.append({"role": "assistant", "content": m.response})
+
+                        # 🔍 بررسی نیاز به سرچ وب
+
+                        search_keywords = ["دلار", "ملک", "اخبار", "هوا", "قیمت", "کی", "چند", "کجا", "چگونه", "آخرین"]
+
+                        if any(word in prompt for word in search_keywords):
+
+                            web_info = search_web_snippet(prompt)
+
+                            if web_info:
+                                prompt += f"\n\n🛰 این اطلاعات از جستجوی وب پیدا شد:\n{web_info}"
+
+                        history.append({"role": "user", "content": prompt})
+
+                        result = client.chat.completions.create(
+
+                            model="gpt-4o",
+
+                            messages=history,
+
+                            max_tokens=1200,
+
+                            temperature=0.7
+
+                        )
+
+                        reply = result.choices[0].message.content
+
+                        usage = result.usage
+
+
+                except Exception as e:
+
+                    return HttpResponse(f"🚫 خطا در تحلیل پیام: {str(e)}", status=500)
 
         except Exception as e:
-            return HttpResponse(f"🚫 خطا در تحلیل: {str(e)}", status=500)
+            return HttpResponse(f"🚫 خطا در پردازش پیام: {str(e)}", status=500)
 
         total_tokens = usage.total_tokens if hasattr(usage, 'total_tokens') else usage.get('total_tokens', 0)
         prompt_tokens = getattr(usage, 'prompt_tokens', 0)
