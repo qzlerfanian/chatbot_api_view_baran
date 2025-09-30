@@ -48,3 +48,6 @@ def get_relevant_chunks(query, user, top_k=5):
     scored = [(chunk, cosine_similarity(chunk.embedding, query_emb)) for chunk in chunks]
     scored.sort(key=lambda x: x[1], reverse=True)
     return [item[0] for item in scored[:top_k]]
+
+#----------------------------------
+

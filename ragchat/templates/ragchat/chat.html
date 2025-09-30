@@ -1,0 +1,14 @@
+{% extends "ragchat/base.html" %}
+{% block content %}
+<h2>چت با {{ chat.name }}</h2>
+<div class="chat-box">
+    {% for m in messages %}
+        <p><b>{{ m.role }}:</b> {{ m.content }}</p>
+    {% endfor %}
+</div>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="question" placeholder="سوالت رو بپرس..." required>
+    <button type="submit">ارسال</button>
+</form>
+{% endblock %}

@@ -171,8 +171,16 @@ def admin_panel(request):
     return render(request, 'admin_panel.html', {'data': data})
 
 # استفاده از  gpt  واقعی
-client = openai.OpenAI(api_key= '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'
-)  # ← کلید API اینجا قرار می‌گیره یا از env
+# client = openai.OpenAI(api_key= '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'
+# )
+
+
+# ← کلید API اینجا قرار می‌گیره یا از env
+from openai import OpenAI
+
+client = OpenAI(api_key= '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'
+)
+
 
 USER_LAST_MESSAGE_TIME = {}
 MIN_INTERVAL_SECONDS = 5
@@ -190,6 +198,11 @@ def generate_chat_title(prompt, image, audio, document):
         return "بررسی سند 📄"
     else:
         return "جلسه جدید"
+
+
+
+
+
 
 
 #
@@ -382,7 +395,7 @@ def send_message(request):
         prompt = form.cleaned_data.get('prompt', '')
         image = form.cleaned_data.get("image")
         audio = form.cleaned_data.get("audio")
-        document = form.cleaned_data.get("document")
+        document = request.FILES.get("document")
         session_id = request.POST.get('session_id')
 
         print("🟢 PROMPT:", prompt)
@@ -576,10 +589,122 @@ def send_message(request):
 
                     return HttpResponse(f"🚫 خطا هنگام پردازش ویس: {str(exc)}", status=500)
 
+
+
+
             elif document:
-                file_response = client.files.create(file=document, purpose="assistants")
-                reply = "✅ فایل شما آپلود شد ولی فعلاً پشتیبانی از تحلیل مستقیم فایل فعال نیست."
+                # همیشه از اول usage رو تعریف کن
                 usage = {'total_tokens': 0, 'prompt_tokens': 0, 'completion_tokens': 0}
+                reply = "❌ مشکلی پیش آمده است."  # پیش‌فرض اولیه
+
+                try:
+                    # گرفتن فایل از request
+                    uploaded_file = document  # چون قبلاً از request.FILES پاس دادی
+
+                    # 1) ایجاد Vector Store
+                    vector_store = client.beta.vector_stores.create(
+                        name=f"user_{user.id}_store"
+                    )
+
+                    # 2) آپلود فایل به Vector Store (روش upload_and_poll)
+                    file_streams = [uploaded_file]
+                    client.beta.vector_stores.file_batches.upload_and_poll(
+                        vector_store_id=vector_store.id,
+                        files=file_streams
+                    )
+
+                    # 3) ساخت Assistant متصل به فایل
+                    assistant = client.beta.assistants.create(
+                        name="File Chat Assistant",
+                        instructions=(
+                            "شما یک دستیار حرفه‌ای هستید که باید به پرسش‌های کاربر بر اساس محتوای فایل‌های آپلود شده پاسخ دهید. "
+                            "اگر جواب داخل فایل نبود، مودبانه اعلام کنید."
+                        ),
+                        model="gpt-4o-mini",
+                        tools=[{"type": "file_search"}],
+                        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
+                    )
+
+                    # 4) ذخیره اطلاعات در سشن
+                    chat_session.assistant_id = assistant.id
+                    chat_session.vector_store_id = vector_store.id
+                    chat_session.save()
+
+                    reply = "✅ فایل شما با موفقیت آپلود شد و حالا می‌توانید با آن چت کنید."
+
+                except Exception as e:
+                    reply = f"❌ خطا در پردازش فایل: {str(e)}"
+                    usage = {'total_tokens': 0, 'prompt_tokens': 0, 'completion_tokens': 0}
+
+                try:
+
+                    # گرفتن فایل از request
+
+                    uploaded_file = document  # چون قبلاً از request.FILES پاس دادی
+
+                    # 1) ایجاد Vector Store
+
+                    vector_store = client.beta.vector_stores.create(
+
+                        name=f"user_{user.id}_store"
+
+                    )
+
+                    # 2) آپلود فایل به Vector Store (روش upload_and_poll)
+
+                    file_streams = [uploaded_file]  # چون خودش یک فایل باینری از request هست
+
+                    client.beta.vector_stores.file_batches.upload_and_poll(
+
+                        vector_store_id=vector_store.id,
+
+                        files=file_streams
+
+                    )
+
+                    # 3) ساخت Assistant متصل به فایل
+
+                    assistant = client.beta.assistants.create(
+
+                        name="File Chat Assistant",
+
+                        instructions=(
+
+                            "شما یک دستیار حرفه‌ای هستید که باید به پرسش‌های کاربر بر اساس محتوای فایل‌های آپلود شده پاسخ دهید. "
+        
+                            "اگر جواب داخل فایل نبود، مودبانه اعلام کنید."
+
+                        ),
+
+                        model="gpt-4o-mini",
+
+                        tools=[{"type": "file_search"}],
+
+                        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}}
+
+                    )
+
+                    # 4) ذخیره اطلاعات در سشن
+
+                    chat_session.assistant_id = assistant.id
+
+                    chat_session.vector_store_id = vector_store.id
+
+                    chat_session.save()
+
+                    reply = "✅ فایل شما با موفقیت آپلود شد و حالا می‌توانید با آن چت کنید."
+
+                    usage = {'total_tokens': 0, 'prompt_tokens': 0, 'completion_tokens': 0}
+
+
+                except Exception as e:
+
+                    reply = f"❌ خطا در پردازش فایل: {str(e)}"
+
+                    usage = None
+
+
+
 
 
             else:
@@ -662,6 +787,7 @@ def send_message(request):
                         usage = {"total_tokens": 0}
 
 
+
                     else:
 
                         # 4) مسیر عادی → پیام متنی
@@ -675,32 +801,25 @@ def send_message(request):
 
                             history.append({"role": "assistant", "content": m.response})
 
-                        # 🔍 بررسی نیاز به سرچ وب
-
-                        search_keywords = ["دلار", "ملک", "اخبار", "هوا", "قیمت", "کی", "چند", "کجا", "چگونه", "آخرین"]
-
-                        if any(word in prompt for word in search_keywords):
-
-                            web_info = search_web_snippet(prompt)
-
-                            if web_info:
-                                prompt += f"\n\n🛰 این اطلاعات از جستجوی وب پیدا شد:\n{web_info}"
+                        # 🔍 اینجا دیگه نیازی به سرچ دستی نیست، ابزار وب سرچ داخلی صدا زده میشه
 
                         history.append({"role": "user", "content": prompt})
 
-                        result = client.chat.completions.create(
+                        result = client.responses.create(
 
-                            model="gpt-4o",
+                            model="gpt-4o",  # یا gpt-4o بسته به نیاز
 
-                            messages=history,
+                            tools=[{"type": "web_search"}],
 
-                            max_tokens=1200,
+                            input=history,
+
+                            max_output_tokens=1200,
 
                             temperature=0.7
 
                         )
 
-                        reply = result.choices[0].message.content
+                        reply = result.output_text
 
                         usage = result.usage
 

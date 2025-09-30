@@ -29,6 +29,8 @@ urlpatterns = [
     path('rag/', include('rag.urls')),
     path('image/', include('generator.urls')),
     path('chatimage/', include('chatimage.urls')),
+    path('ragchat/', include('ragchat.urls')),
+
 
 ]
 

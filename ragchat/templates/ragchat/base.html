@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>چت با فایل</title>
+<style>
+body {
+    margin: 0;
+    font-family: "Vazirmatn", "Tahoma", sans-serif;
+    background: #f8f9fb;
+    color: #222;
+    display: flex;
+    height: 100vh;
+    direction: rtl;
+}
+
+/* ساختار کلی */
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* سایدبار */
+.sidebar {
+    width: 280px;
+    background: #ffffff;
+    border-left: 1px solid #e5e7eb;
+    padding: 20px;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h3 {
+    margin: 0 0 15px;
+    font-size: 1.2rem;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+/* لیست فایل‌ها */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f3f4f6;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.sidebar ul li:hover {
+    background: #e5e7eb;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: 500;
+}
+
+.sidebar ul li .delete {
+    color: #de0000;
+    font-weight: bold;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+/* فرم آپلود */
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type="file"] {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+    cursor: pointer;
+}
+
+button {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #4338ca, #2563eb);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* بخش محتوا */
+.content {
+    flex-grow: 1;
+    background: #f9fafb;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* جعبه چت */
+.chat-box {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+    height: 70vh;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+}
+
+.message.assistant {
+    align-self: flex-start;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+/* پیام‌ها */
+.chat-box p {
+    margin: 0;
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+/* پیام کاربر */
+.chat-box p:has(b:contains("user")) {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+/* پیام دستیار */
+.chat-box p:has(b:contains("assistant")) {
+    align-self: flex-start;
+    background: #f3f4f6;
+    color: #111827;
+    border-bottom-left-radius: 4px;
+}
+
+/* هدر چت */
+h2 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #374151;
+}
+
+/* فرم پایین چت */
+form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+}
+
+/* ورودی سوال */
+input[name="question"] {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: #f9fafb;
+    font-size: 0.95rem;
+}
+
+/* دکمه ارسال */
+button {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #4338ca, #2563eb);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h3>فایل‌ها</h3>
+        <ul>
+            {% for c in chats %}
+            <li><a href="{% url 'chat' c.id %}">{{ c.name }}</a>
+                <a href="{% url 'delete_chat' c.id %}" class="delete">X</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if chat %}
+<form method="post" enctype="multipart/form-data" action="{% url 'chat' chat.id %}">
+    {% csrf_token %}
+    <input type="file" name="file">
+    <button type="submit">آپلود</button>
+</form>
+{% else %}
+<form method="post" enctype="multipart/form-data" action="{% url 'index' %}">
+    {% csrf_token %}
+    <input type="file" name="file">
+    <button type="submit">آپلود</button>
+</form>
+{% endif %}
+
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+</body>
+</html>
