@@ -101,6 +101,12 @@
         border-top: 1px solid #ddd;
     }
 
+    .generate-status {
+        margin: 8px 0 4px 0;
+        color: #444;
+        font-size: 0.9rem;
+    }
+
     textarea {
         width: 100%;
         min-height: 60px;
@@ -417,6 +423,8 @@
 
             <textarea name="prompt" placeholder="... write your message"></textarea>
 
+            <div id="generate-status" class="generate-status"></div>
+
             <div class="action-bar">
                 <div class="tools-group">
                     <button type="button" id="tools-toggle" class="tools-toggle">⋯ ابزارها</button>
@@ -571,6 +579,8 @@ window.onload = function () {
 const textarea = document.querySelector("textarea[name='prompt']");
 const sendBtn = document.querySelector(".send-btn");
 const form = document.querySelector(".form-container");
+const generateStatus = document.getElementById('generate-status');
+const chatWindowEl = document.getElementById('chat-window');
 
 let isComposing = false; // برای جلوگیری از ارسال وسط تایپ فارسی/چینی
 
@@ -586,6 +596,41 @@ textarea.addEventListener("keydown", function (e) {
         form.submit();
     }
     // Shift+Enter => خط جدید (پیش‌فرض مرورگر)
+});
+
+// نمایش وضعیت، ارسال ایجکسی فرم، و رفرش پس از موفقیت
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (generateStatus) generateStatus.textContent = 'در حال تولید پیام...';
+    if (textarea) textarea.setAttribute('disabled', 'disabled');
+    if (sendBtn) sendBtn.setAttribute('disabled', 'disabled');
+
+    let pending;
+    if (chatWindowEl) {
+        pending = document.createElement('div');
+        pending.className = 'message gpt-message';
+        pending.id = 'pending-msg';
+        pending.innerHTML = '<p><strong>GPT:</strong> <span>در حال تولید پیام...</span></p>';
+        chatWindowEl.appendChild(pending);
+        chatWindowEl.scrollTo({ top: chatWindowEl.scrollHeight, behavior: 'smooth' });
+    }
+
+    try {
+        const formData = new FormData(form);
+        const resp = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            body: formData,
+        });
+        if (!resp.ok) throw new Error('response_not_ok');
+        // پس از موفقیت، صفحه را رفرش کن تا پیام جدید نمایش داده شود
+        window.location.reload();
+    } catch (err) {
+        if (generateStatus) generateStatus.textContent = 'خطا در ارسال. دوباره تلاش کنید.';
+        if (textarea) textarea.removeAttribute('disabled');
+        if (sendBtn) sendBtn.removeAttribute('disabled');
+        if (pending) pending.remove();
+    }
 });
 
 

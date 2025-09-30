@@ -5,6 +5,9 @@
     {% for m in messages %}
         <p><b>{{ m.role }}:</b> {{ m.content }}</p>
     {% endfor %}
+    <div class="scroll-container">
+        <button id="scroll-down-btn" class="scroll-btn">⬇️ رفتن به آخر گفتگو</button>
+    </div>
 </div>
 <form method="post">
     {% csrf_token %}

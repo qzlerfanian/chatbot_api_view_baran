@@ -2,11 +2,13 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>چت با فایل</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css" rel="stylesheet">
 <style>
 body {
     margin: 0;
-    font-family: "Vazirmatn", "Tahoma", sans-serif;
+    font-family: 'Vazir', Tahoma, sans-serif;
     background: #f8f9fb;
     color: #222;
     display: flex;
@@ -77,8 +79,8 @@ body {
     margin-right: 10px;
 }
 
-/* فرم آپلود */
-form {
+/* فرم آپلود (فقط سایدبار) */
+.sidebar form {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
@@ -115,7 +117,9 @@ button:hover {
     flex-grow: 1;
     background: #f9fafb;
     padding: 30px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* جعبه چت */
@@ -124,12 +128,33 @@ button:hover {
     border: 1px solid #e5e7eb;
     border-radius: 16px;
     padding: 20px;
-    height: 70vh;
+    flex: 1 1 auto;
     overflow-y: auto;
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* دکمه اسکرول به انتهای گفتگو داخل باکس پیام‌ها */
+.scroll-container {
+    position: sticky;
+    bottom: 8px;
+    display: flex;
+    justify-content: center;
+    padding: 6px 0;
+    pointer-events: none; /* اسکرول باکس پیام‌ها حفظ شود */
+}
+.scroll-btn {
+    background: #505050;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    pointer-events: auto;
 }
 
 .message.user {
@@ -153,6 +178,54 @@ button:hover {
     line-height: 1.6;
     font-size: 0.95rem;
     word-wrap: break-word;
+    background: #f3f4f6;
+}
+
+/* موبایل */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1001;
+        background: #505050;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        z-index: 1000;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -2px 0 12px rgba(0,0,0,0.08);
+    }
+    .sidebar.active { right: 0; }
+
+    .backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.25);
+        z-index: 999;
+    }
+    .backdrop.active { display: block; }
+
+    .content { padding: 60px 16px 0; }
+    .chat-box { margin-bottom: 0; }
+    .chat-box p { max-width: 100%; font-size: 1.08rem; padding: 14px 18px; }
+    .scroll-btn { padding: 10px 16px; font-size: 1rem; }
+    .content > form {
+        padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+        gap: 8px;
+    }
+    .content input[name="question"] { font-size: 1.05rem; padding: 15px 16px; }
 }
 
 /* پیام کاربر */
@@ -178,38 +251,43 @@ h2 {
     color: #374151;
 }
 
-/* فرم پایین چت */
-form {
+/* فرم پایین چت فقط در بخش محتوا و ثابت در پایین */
+.content > form {
     display: flex;
     align-items: center;
     gap: 10px;
     border-top: 1px solid #e5e7eb;
     padding-top: 12px;
+    padding-bottom: 12px;
+    position: sticky;
+    bottom: 0;
+    background: #f9fafb;
+    z-index: 5;
 }
 
 /* ورودی سوال */
-input[name="question"] {
+.content input[name="question"] {
     flex-grow: 1;
-    padding: 12px;
+    padding: 14px 16px;
     border: 1px solid #d1d5db;
-    border-radius: 12px;
-    background: #f9fafb;
-    font-size: 0.95rem;
+    border-radius: 18px;
+    background: #ffffff;
+    font-size: 1rem;
 }
 
-/* دکمه ارسال */
-button {
+/* دکمه ارسال داخل بخش محتوا */
+.content button {
     background: linear-gradient(135deg, #4f46e5, #3b82f6);
     border: none;
     color: white;
-    padding: 10px 18px;
+    padding: 12px 18px;
     font-size: 0.95rem;
     border-radius: 12px;
     cursor: pointer;
     transition: 0.2s ease-in-out;
 }
 
-button:hover {
+.content button:hover {
     background: linear-gradient(135deg, #4338ca, #2563eb);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
@@ -219,6 +297,7 @@ button:hover {
 </head>
 <body>
 <div class="container">
+    <button id="menu-toggle" class="menu-toggle" style="display:none">☰</button>
     <div class="sidebar">
         <h3>فایل‌ها</h3>
         <ul>
@@ -247,5 +326,33 @@ button:hover {
         {% block content %}{% endblock %}
     </div>
 </div>
+<div id="backdrop" class="backdrop"></div>
+<script>
+(function(){
+    const menuBtn = document.getElementById('menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('backdrop');
+    if (!menuBtn || !sidebar) return;
+    // نمایش دکمه فقط در موبایل با CSS انجام می‌شود
+    menuBtn.addEventListener('click', function(){
+        sidebar.classList.toggle('active');
+        if (backdrop) backdrop.classList.toggle('active', sidebar.classList.contains('active'));
+    });
+    if (backdrop) {
+        backdrop.addEventListener('click', function(){
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+    }
+})();
+
+// اسکرول به انتهای گفتگو با دکمه
+document.addEventListener('click', function(e){
+    if (e.target && e.target.id === 'scroll-down-btn') {
+        const chatBox = document.querySelector('.chat-box');
+        if (chatBox) chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+    }
+});
+</script>
 </body>
 </html>
