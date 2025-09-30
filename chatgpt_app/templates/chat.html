@@ -2,6 +2,7 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>چت با GPT</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font/dist/font-face.css" rel="stylesheet">
 <style>
@@ -22,6 +23,7 @@
         border-right: 1px solid #eee;
         padding: 1rem;
         overflow-y: auto;
+        box-shadow: 0 0 20px rgba(0,0,0,0.06);
     }
 
     .sidebar a {
@@ -38,7 +40,11 @@
         border-radius: 8px;
         text-decoration: none;
         font-size: 0.8rem;
+        transition: background 0.2s ease, transform 0.1s ease;
     }
+
+    .new-chat-btn:hover { background: #dcdcdc; }
+    .new-chat-btn:active { transform: translateY(1px); }
 
     .main {
         flex: 1;
@@ -56,6 +62,16 @@
         flex-direction: column;
         background: #fff;
         font-size: 0.8rem;
+    }
+
+    /* نوار چسبنده برای جای دادن دکمه اسکرول در انتهای لیست پیام‌ها */
+    .scroll-container {
+        position: sticky;
+        bottom: 8px;
+        display: flex;
+        justify-content: center;
+        padding: 8px 0;
+        pointer-events: none; /* اجازه اسکرول؛ خود دکمه pointer-events دارد */
     }
 
     .message {
@@ -141,20 +157,79 @@
         border-radius: 20px;
         cursor: pointer;
         font-size: 14px;
+        border: 1px solid rgba(0,0,0,0.08);
+        white-space: nowrap;
     }
 
+    .file-btn:hover, .mic-btn:hover { filter: brightness(1.05); }
+
+    /* ابزارها: دکمه باز/بسته در موبایل */
+    .tools-toggle {
+        display: none;
+        width: 100%;
+        background: #f3f3f3;
+        color: #111;
+        border: 1px solid #e5e5e5;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin: 8px 0;
+        font-size: 0.9rem;
+    }
+
+    /* اکشن‌بار: ابزار + ارسال کنار هم */
+    .action-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .tools-group { position: relative; flex: 1; }
+    .tools-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        z-index: 1002;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        border-radius: 10px;
+        padding: 10px;
+        min-width: 220px;
+    }
+    .tools-panel.open { display: block; }
+    .tools-list { display: flex; flex-direction: column; gap: 8px; }
+
+    /* استایل یکسان و مربعی خاکستری روشن فقط برای دکمه‌های داخل ابزارها */
+    .tools-panel .mic-btn,
+    .tools-panel .file-btn,
+    .tools-panel button {
+        background: #f3f3f3 !important;
+        color: #111 !important;
+        border: 1px solid #e5e5e5 !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        font-size: 0.95rem !important;
+        box-shadow: none !important;
+    }
+    .tools-panel .mic-btn:hover,
+    .tools-panel .file-btn:hover,
+    .tools-panel button:hover {
+        background: #ebebeb !important;
+    }
+    .tools-panel .mic-btn.recording { background: #ffdddd !important; border-color: #ffc6c6 !important; }
+
     .scroll-btn {
-        position: fixed;
-        bottom: 200px;
-        right: 20px;
         background-color: #505050;
         color: white;
         padding: 10px 14px;
         border: none;
-        border-radius: 50%;
-        font-size: 20px;
+        border-radius: 22px;
+        font-size: 16px;
         cursor: pointer;
-        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        pointer-events: auto;
     }
 
     /* 📱 موبایل */
@@ -197,20 +272,31 @@
             right: 0;
         }
 
+        /* پرده تار برای بستن سایدبار با کلیک بیرون */
+        .backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 999;
+        }
+        .backdrop.active { display: block; }
+
         .main {
             margin-top: 50px; /* جا برای منو */
             height: calc(100vh - 50px);
         }
 
         .chat-window {
-            font-size: 1rem;
-            padding: 1rem;
+            font-size: 1.1rem;
+            padding: 1.2rem 1rem 2.8rem; /* فضای پایین برای دکمه چسبان */
         }
 
         .message {
             max-width: 100%;
-            font-size: 1rem;
-            padding: 0.8rem 1rem;
+            font-size: 1.2rem;
+            line-height: 1.9;
+            padding: 1rem 1.2rem;
         }
 
         .form-container {
@@ -219,28 +305,57 @@
         }
 
         textarea {
-            min-height: 70px;
-            font-size: 1rem;
+            min-height: 80px;
+            font-size: 1.1rem;
         }
 
         .send-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 16px;
-            font-size: 22px;
+            position: static;
+            padding: 14px;
+            font-size: 20px;
         }
 
-        .scroll-btn {
-            bottom: 90px;
-            right: 20px;
+        /* موبایل: دکمه ابزار دیده شود و منو به شکل Bottom Sheet باز شود */
+        .tools-toggle { display: block; padding: 10px 12px; border-radius: 10px; font-size: 0.95rem; }
+        .tools-panel {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: auto;
+            max-height: 55vh;
+            overflow-y: auto;
+            border-radius: 12px 12px 0 0;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.18);
+            padding: 12px;
+            margin: 0;
+            min-width: unset;
+            z-index: 1002;
         }
+        .file-btn, .mic-btn { font-size: 14px; padding: 8px 12px; }
+        .tools-list { gap: 10px; }
     }
 
     /* دسکتاپ: همبرگری مخفی */
     @media (min-width: 769px) {
         .menu-toggle {
             display: none;
+        }
+        .backdrop { display: none !important; }
+        /* دسکتاپ: منوی ابزار داخل صفحه و رو به بالا باز شود */
+        .tools-toggle { display: inline-block; width: auto; }
+        .tools-group { max-width: 60%; position: relative; }
+        .tools-panel {
+            position: absolute;
+            right: 0;
+            left: auto;
+            top: auto;
+            bottom: calc(100% + 8px);
+            max-width: min(420px, 50vw);
+            max-height: 60vh;
+            overflow-y: auto;
+            border-radius: 10px;
         }
     }
 </style>
@@ -272,6 +387,9 @@
         </ul>
     </div>
 
+    <!-- پرده تار جهت بستن منو در موبایل -->
+    <div id="backdrop" class="backdrop"></div>
+
     <!-- محتوای اصلی -->
     <div class="main">
         <!-- پیام‌ها -->
@@ -287,6 +405,9 @@
                 <small class="copy-btn" onclick="copyText(this)"> copy</small>
             </div>
             {% endfor %}
+            <div class="scroll-container">
+                <button id="scroll-down-btn" class="scroll-btn">⬇️ رفتن به آخر گفتگو</button>
+            </div>
         </div>
 
         <!-- فرم پایین -->
@@ -296,36 +417,54 @@
 
             <textarea name="prompt" placeholder="... write your message"></textarea>
 
-            <div class="attachments">
-                <div class="left-items">
-                    <button type="button" id="mic-btn" class="mic-btn">🎤 mic</button>
-                    <button id="request-mic" type="button">🎤 اجازه دسترسی</button>
-                    <button id="mic-toggle" type="button">⏺️ ضبط/توقف</button>
-                    <span id="recording-status" style="margin-left:10px;color:red;display:none;">🔴 در حال ضبط...</span>
-                    <input type="file" id="recorded-audio" name="voice" hidden>
+            <div class="action-bar">
+                <div class="tools-group">
+                    <button type="button" id="tools-toggle" class="tools-toggle">⋯ ابزارها</button>
+                    <div id="tools-panel" class="tools-panel">
+                        <div class="tools-list">
+                            <button type="button" id="mic-btn" class="mic-btn">🎤 mic</button>
+                            <button id="request-mic" type="button">🎤 اجازه دسترسی</button>
+                            <button id="mic-toggle" type="button">⏺️ ضبط/توقف</button>
+                            <label for="image-input" class="file-btn">📸 image</label>
+                            <input type="file" id="image-input" name="image" accept="image/*" capture="environment" hidden>
+                            <label for="audio-input" class="file-btn">🎙 voice</label>
+                            <input type="file" id="audio-input" name="audio" accept="audio/*" capture="microphone" hidden>
+                            <span id="recording-status" style="margin-right:4px;color:red;display:none;">🔴 در حال ضبط...</span>
+                            <input type="file" id="recorded-audio" name="voice" hidden>
+                        </div>
+                    </div>
                 </div>
-                <div class="right-items">
-                    <label for="image-input" class="file-btn">📸 image</label>
-                    <input type="file" id="image-input" name="image" accept="image/*" capture="environment" hidden>
-                    <label for="audio-input" class="file-btn">🎙 voice</label>
-                    <input type="file" id="audio-input" name="audio" accept="audio/*" capture="microphone" hidden>
-                    <label for="document-input" class="file-btn">📄 file</label>
-                    <input type="file" id="document-input" name="document" hidden>
-                </div>
+                <button type="submit" class="send-btn">➤</button>
             </div>
-
-            <button type="submit" class="send-btn">➤</button>
         </form>
-
-        <button id="scroll-down-btn" class="scroll-btn">↓</button>
     </div>
 
 <script>
     const menuBtn = document.getElementById("menu-toggle");
     const sidebar = document.querySelector(".sidebar");
+    const backdrop = document.getElementById("backdrop");
     menuBtn.addEventListener("click", () => {
         sidebar.classList.toggle("active");
+        backdrop.classList.toggle("active", sidebar.classList.contains("active"));
     });
+    if (backdrop) {
+        backdrop.addEventListener("click", () => {
+            sidebar.classList.remove("active");
+            const toolsPanelEl = document.getElementById('tools-panel');
+            if (toolsPanelEl) toolsPanelEl.classList.remove('open');
+            backdrop.classList.remove("active");
+        });
+    }
+
+    // ابزارها (اسلایدر موبایل)
+    const toolsToggle = document.getElementById('tools-toggle');
+    const toolsPanel = document.getElementById('tools-panel');
+    if (toolsToggle && toolsPanel) {
+        toolsToggle.addEventListener('click', () => {
+            toolsPanel.classList.toggle('open');
+            if (backdrop) backdrop.classList.toggle('active', toolsPanel.classList.contains('open'));
+        });
+    }
 
 
 let mediaRecorder;
