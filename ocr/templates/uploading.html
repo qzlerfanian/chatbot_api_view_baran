@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>آپلود فایل OCR</title>
+
+  <!-- فونت وزیر از CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003.2/Vazirmatn-font-face.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(135deg, #f9f9f9, #ececec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 400px;
+      transition: all 0.3s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="file"] {
+      padding: 0.8rem;
+      border: 2px dashed #bbb;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      border-color: #666;
+      background: #f0f0f0;
+    }
+
+    button {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      background: #4a90e2;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #357ab7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>آپلود فایل (عکس یا PDF)</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">ارسال</button>
+    </form>
+  </div>
+</body>
+</html>

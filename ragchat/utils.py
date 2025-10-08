@@ -1,10 +1,19 @@
 import io
-from openai import OpenAI
+import re
+
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
 
 # استفاده از متغیر محیطی بهتره
 from django.conf import settings
-client = OpenAI(api_key= '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'
-)
+
+if OpenAI:
+    client = OpenAI(api_key= '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'
+    )
+else:
+    client = None
 def create_vector_store(file_obj, filename=None, vector_store_id=None):
     """
     - file_obj: file-like object (InMemoryUploadedFile یا BytesIO)

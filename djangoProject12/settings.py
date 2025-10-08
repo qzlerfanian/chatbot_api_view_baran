@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'generator',
     'chatimage',
     'ragchat',
+    'ocr',
+
 ]
 
 MIDDLEWARE = [

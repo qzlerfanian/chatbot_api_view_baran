@@ -412,7 +412,7 @@
             </div>
             {% endfor %}
             <div class="scroll-container">
-                <button id="scroll-down-btn" class="scroll-btn">⬇️ رفتن به آخر گفتگو</button>
+                <button id="scroll-down-btn" class="scroll-btn">⬇️ </button>
             </div>
         </div>
 
@@ -427,17 +427,17 @@
 
             <div class="action-bar">
                 <div class="tools-group">
-                    <button type="button" id="tools-toggle" class="tools-toggle">⋯ ابزارها</button>
+                    <button type="button" id="tools-toggle" class="tools-toggle">Tools</button>
                     <div id="tools-panel" class="tools-panel">
                         <div class="tools-list">
-                            <button type="button" id="mic-btn" class="mic-btn">🎤 mic</button>
-                            <button id="request-mic" type="button">🎤 اجازه دسترسی</button>
-                            <button id="mic-toggle" type="button">⏺️ ضبط/توقف</button>
-                            <label for="image-input" class="file-btn">📸 image</label>
+                            <button type="button" id="mic-btn" class="mic-btn"> mic</button>
+                            <button id="request-mic" type="button"> Allow to mic</button>
+                            <button id="mic-toggle" type="button">stop / start </button>
+                            <label for="image-input" class="file-btn"> image</label>
                             <input type="file" id="image-input" name="image" accept="image/*" capture="environment" hidden>
-                            <label for="audio-input" class="file-btn">🎙 voice</label>
+                            <label for="audio-input" class="file-btn"> voice</label>
                             <input type="file" id="audio-input" name="audio" accept="audio/*" capture="microphone" hidden>
-                            <span id="recording-status" style="margin-right:4px;color:red;display:none;">🔴 در حال ضبط...</span>
+                            <span id="recording-status" style="margin-right:4px;color:red;display:none;"> recording ... </span>
                             <input type="file" id="recorded-audio" name="voice" hidden>
                         </div>
                     </div>

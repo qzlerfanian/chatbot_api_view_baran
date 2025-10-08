@@ -1,15 +1,28 @@
-import fitz  # PyMuPDF
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    fitz = None
+
 import numpy as np
 from .models import FileChunk
 from django.conf import settings
-from openai import OpenAI
 
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
 
-client =OpenAI(api_key= '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',
-timeout=30
-)  # ← کلید API اینجا قرار می‌گیره یا از env
+if OpenAI:
+    client = OpenAI(api_key= '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',
+    timeout=30
+    )  # ← کلید API اینجا قرار می‌گیره یا از env
+else:
+    client = None
 
 def extract_text_from_pdf(path):
+    if not fitz:
+        return "PDF processing not available"
+    
     doc = fitz.open(path)
     text = ""
     for page in doc:

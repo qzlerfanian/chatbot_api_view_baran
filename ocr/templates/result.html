@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نتیجه OCR</title>
+
+  <!-- فونت وزیر -->
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003.2/Vazirmatn-font-face.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(135deg, #f9f9f9, #ececec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      width: 600px;
+      transition: all 0.3s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 1.2rem;
+      color: #333;
+      text-align: center;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.8;
+    }
+
+    h3 {
+      margin-top: 1.5rem;
+      color: #444;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    ul li a {
+      display: inline-block;
+      padding: 0.7rem 1.2rem;
+      border-radius: 10px;
+      background: #4a90e2;
+      color: white;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background 0.3s ease;
+    }
+
+    ul li a:hover {
+      background: #357ab7;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      color: #4a90e2;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #357ab7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>متن استخراج‌شده</h1>
+    <pre>{{ obj.extracted_text }}</pre>
+
+    <h3>دانلود خروجی:</h3>
+    <ul>
+      <li><a href="{% url 'download_docx' obj.pk %}">📄 دانلود Word</a></li>
+      <li><a href="{% url 'download_pdf' obj.pk %}">📑 دانلود PDF</a></li>
+    </ul>
+
+    <a class="back-link" href="{% url 'ocr' %}">⬅ بازگشت به آپلود</a>
+  </div>
+</body>
+</html>

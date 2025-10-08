@@ -176,10 +176,16 @@ def admin_panel(request):
 
 
 # ← کلید API اینجا قرار می‌گیره یا از env
-from openai import OpenAI
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
 
-client = OpenAI(api_key= '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'
-)
+if OpenAI:
+    client = OpenAI(api_key= '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'
+    )
+else:
+    client = None
 
 
 USER_LAST_MESSAGE_TIME = {}
@@ -358,9 +364,15 @@ def generate_chat_title(prompt, image, audio, document):
 #         return redirect(f'/chat/?session_id={chat_session.id}')
 
 
-from duckduckgo_search import DDGS
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    DDGS = None
 
 def search_web_snippet(query: str) -> str:
+    if not DDGS:
+        return "Search functionality not available"
+    
     try:
         with DDGS() as ddgs:
             results = ddgs.text(query)

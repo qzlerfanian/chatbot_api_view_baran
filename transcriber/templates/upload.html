@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -47,18 +46,14 @@
             bottom: 0;
             width: 100%;
         }
-
     </style>
 </head>
 <body>
 
 <div class="header">
-{#    <img src="{% static 'images/logo-right.png' %}" alt="لوگو راست" >#}
     <div>
         <h2 class="mb-1">Baran Smart convert voice to text</h2>
-{#        <p class="mb-0">سامانه تولید ویس به متن</p>#}
     </div>
-{#    <img src="{% static 'images/logo-left.png' %}" alt="لوگو چپ" >#}
 </div>
 
 <div class="container mt-4 mb-5">
@@ -71,7 +66,7 @@
 
             <div class="d-flex justify-content-between mt-3">
                 <button type="submit" class="btn btn-primary">Send</button>
-                {# <button type="button" id="start-record" class="btn btn-outline-secondary">🎤 ضبط صدا</button> #}
+                <button type="button" id="start-record" class="btn btn-outline-secondary">🎤 ضبط صدا</button>
             </div>
         </form>
 
@@ -82,6 +77,9 @@
                 <p>{{ transcript }}</p>
             </div>
         {% endif %}
+
+        <!-- پیش‌نمایش صدای ضبط‌شده -->
+        <audio id="preview" controls class="mt-3 w-100" style="display:none;"></audio>
     </div>
 </div>
 
@@ -93,16 +91,17 @@
       Downloade Word file
   </a>
 {% endif %}
+
 <footer>
-        تمامی حقوق برای بیناتوسعه محفوظ است ©
-    </footer>
+    تمامی حقوق برای بیناتوسعه محفوظ است. ©
+</footer>
+
 <!-- جاوااسکریپت برای ضبط صدا -->
 <script>
     let mediaRecorder;
     let audioChunks = [];
 
-    document.getElementById("start-record")?.addEventListener("click", async () => {
-        console.log("دکمه ضبط کلیک شد");
+    document.getElementById("start-record").addEventListener("click", async () => {
         if (!mediaRecorder || mediaRecorder.state === "inactive") {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -115,19 +114,29 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    console.log("ضبط متوقف شد");
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioURL = URL.createObjectURL(audioBlob);
+
+                    // نمایش پیش‌نمایش صدا
+                    const preview = document.getElementById("preview");
+                    preview.src = audioURL;
+                    preview.style.display = "block";
+
+                    // ارسال به سرور
                     const formData = new FormData();
-                    formData.append('audio', audioBlob, 'recorded_audio.wav');
+                    formData.append('audio', audioBlob, 'recorded_audio.webm');
 
                     fetch('', {
                         method: 'POST',
+                        headers: { "X-CSRFToken": "{{ csrf_token }}" },
                         body: formData
-                    }).then(response => {
+                    })
+                    .then(response => {
                         if (!response.ok) throw new Error("خطا در ارسال فایل");
                         return response.text();
-                    }).then(() => location.reload())
-                      .catch(error => alert("خطا: " + error.message));
+                    })
+                    .then(() => location.reload())
+                    .catch(error => alert("خطا: " + error.message));
                 };
 
                 mediaRecorder.start();

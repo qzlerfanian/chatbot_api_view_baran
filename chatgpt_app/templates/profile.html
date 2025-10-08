@@ -124,9 +124,12 @@ a.button-link {
   <main>
     <div class="grid-container">
       <a href="/chat" class="button-link button-chat">ChatBot</a>
-      <a href="{% url 'upload_file' %}" class="button-link button-dashboard">Ask from file</a>
+{#      <a href="{% url 'upload_file' %}" class="button-link button-dashboard">Ask from file</a>#}
       <a href="{% url 'upload_audio' %}" class="button-link button-dashboard">voice to text</a>
       <a href="{% url 'generate_image' %}" class="button-link button-dashboard">text to image</a>
+        <a href="{% url 'index' %}" class="button-link button-dashboard">Ask from file</a>
+        <a href="{% url 'imageanalys' %}" class="button-link button-dashboard">image Analysis</a>
+        <a href="{% url 'ocr' %}" class="button-link button-dashboard">Image to Text(OCR)</a>
       <a href="/dashboard" class="button-link button-dashboard">Dashboard</a>
       <a href="/change-password" class="button-link button-password">change password</a>
       <a href="/logout" class="button-link button-password">Logout</a>
